@@ -11,6 +11,10 @@ jest.mock('../src/config/supabase', () => ({
 
 const mockAdmin = supabaseAdmin as jest.Mocked<typeof supabaseAdmin>;
 
+beforeEach(() => {
+  jest.resetAllMocks();
+});
+
 function mockAdminAuth() {
   (mockAdmin.auth.getUser as jest.Mock).mockResolvedValue({
     data: { user: { id: 'supabase-auth-id' } },
