@@ -41,7 +41,11 @@ export default function RegistroPage() {
         password: form.password,
       });
 
-      if (authError) throw new Error('Error al iniciar sesión automáticamente');
+      if (authError) {
+        // Registration succeeded but auto-login failed — redirect to login
+        router.push('/login?registered=1');
+        return;
+      }
 
       router.push('/perfil');
       router.refresh();

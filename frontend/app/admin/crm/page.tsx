@@ -26,10 +26,12 @@ export default function CRMPage() {
   const [data, setData] = useState<CRMResponse>({ usuarios: [], leads: [] });
   const [loading, setLoading] = useState(true);
   const [exportando, setExportando] = useState(false);
+  const [exportError, setExportError] = useState('');
   const [filtroFuente, setFiltroFuente] = useState('');
   const [filtroEstado, setFiltroEstado] = useState('');
 
   useEffect(() => {
+    setLoading(true);
     const params = new URLSearchParams();
     if (filtroFuente) params.set('fuente', filtroFuente);
     if (filtroEstado) params.set('estado', filtroEstado);
@@ -49,12 +51,22 @@ export default function CRMPage() {
     try {
       const { createSupabaseClient } = await import('@/lib/supabase');
       const supabase = createSupabaseClient();
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) throw new Error('No autenticado');
 
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) throw new Error('Sin token de sesión');
+
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/admin/crm/exportar`,
-        { headers: { Authorization: `Bearer ${session?.access_token}` } }
+        `${API_URL}/api/admin/crm/exportar`,
+        { headers: { Authorization: `Bearer ${session.access_token}` } }
       );
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({ error: `Error ${res.status}` }));
+        throw new Error(errorData.error || `Error ${res.status}`);
+      }
 
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
@@ -63,6 +75,8 @@ export default function CRMPage() {
       a.download = `crm-${new Date().toISOString().split('T')[0]}.xlsx`;
       a.click();
       URL.revokeObjectURL(url);
+    } catch (err: unknown) {
+      setExportError(err instanceof Error ? err.message : 'Error al exportar');
     } finally {
       setExportando(false);
     }
@@ -81,9 +95,14 @@ export default function CRMPage() {
             {todosLosContactos.length} contactos
           </p>
         </div>
-        <Button variant="secondary" onClick={handleExportar} loading={exportando}>
-          Exportar Excel
-        </Button>
+        <div>
+          <Button variant="secondary" onClick={handleExportar} loading={exportando}>
+            Exportar Excel
+          </Button>
+          {exportError && (
+            <p className="text-red-500 text-xs mt-2">{exportError}</p>
+          )}
+        </div>
       </div>
       <div className="flex gap-4 mb-6">
         <select

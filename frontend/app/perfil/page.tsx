@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createSupabaseClient } from '@/lib/supabase';
 import { api } from '@/lib/api';
@@ -25,6 +25,13 @@ export default function PerfilPage() {
   const [loading, setLoading] = useState(true);
   const [guardando, setGuardando] = useState(false);
   const [mensaje, setMensaje] = useState('');
+  const mensajeTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (mensajeTimerRef.current) clearTimeout(mensajeTimerRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     async function loadProfile() {
@@ -55,7 +62,8 @@ export default function PerfilPage() {
       setProfile(updated);
       setEditando(false);
       setMensaje('Perfil actualizado correctamente');
-      setTimeout(() => setMensaje(''), 3000);
+      if (mensajeTimerRef.current) clearTimeout(mensajeTimerRef.current);
+      mensajeTimerRef.current = setTimeout(() => setMensaje(''), 3000);
     } catch (err: unknown) {
       setMensaje(err instanceof Error ? err.message : 'Error al guardar');
     } finally {

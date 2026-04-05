@@ -14,6 +14,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const pathname = usePathname();
   const [loading, setLoading] = useState(true);
+  const [authorized, setAuthorized] = useState(false);
   const [adminNombre, setAdminNombre] = useState('');
 
   useEffect(() => {
@@ -25,6 +26,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           return;
         }
         setAdminNombre(profile.nombre);
+        setAuthorized(true);
       } catch {
         router.push('/login');
       } finally {
@@ -34,7 +36,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     checkAdmin();
   }, [router]);
 
-  if (loading) {
+  if (loading || !authorized) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <p className="text-tierra-light text-sm tracking-widest uppercase">Cargando...</p>

@@ -10,15 +10,27 @@ export default function PrimerAccesoPage() {
   const [email, setEmail] = useState('');
   const [enviado, setEnviado] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
+    setError('');
 
     const supabase = createSupabaseClient();
-    await supabase.auth.resetPasswordForEmail(email, {
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/actualizar-contrasena`,
     });
+
+    if (resetError) {
+      // Only surface rate-limit and config errors, not "user not found" (to avoid enumeration)
+      const isRateLimitOrConfig = resetError.status === 429 || resetError.status === 500;
+      if (isRateLimitOrConfig) {
+        setError('Demasiados intentos. Intenta de nuevo en unos minutos.');
+        setLoading(false);
+        return;
+      }
+    }
 
     setEnviado(true);
     setLoading(false);
@@ -62,6 +74,7 @@ export default function PrimerAccesoPage() {
             placeholder="el mismo que usabas en Nessty"
             required
           />
+          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
           <Button type="submit" loading={loading} className="w-full">
             Enviar enlace
           </Button>

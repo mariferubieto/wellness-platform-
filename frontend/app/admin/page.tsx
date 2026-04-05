@@ -21,10 +21,12 @@ function MetricCard({ label, value }: { label: string; value: number }) {
 export default function AdminDashboard() {
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     api.get<DashboardMetrics>('/api/admin/dashboard')
       .then(setMetrics)
+      .catch((err: unknown) => setError(err instanceof Error ? err.message : 'Error al cargar métricas'))
       .finally(() => setLoading(false));
   }, []);
 
@@ -36,6 +38,8 @@ export default function AdminDashboard() {
       </div>
       {loading ? (
         <p className="text-tierra-light text-sm tracking-widest uppercase">Cargando métricas...</p>
+      ) : error ? (
+        <p className="text-red-500 text-sm">{error}</p>
       ) : metrics ? (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <MetricCard label="Total usuarios" value={metrics.total_usuarios} />
