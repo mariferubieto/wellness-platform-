@@ -1,7 +1,7 @@
-// frontend/next.config.ts
-import type { NextConfig } from 'next';
+// frontend/next.config.mjs
 
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   // Para imágenes de Supabase Storage
   images: {
     remotePatterns: [
