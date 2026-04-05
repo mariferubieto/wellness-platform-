@@ -7,6 +7,12 @@ import {
   getCumpleanosMes,
   exportCRMToExcel,
 } from '../services/crm.service';
+import {
+  getShalaAlumnos,
+  getShalaLeads,
+  exportShalaAlumnosToExcel,
+  exportShalaLeadsToExcel,
+} from '../services/shala-admin.service';
 
 const router = Router();
 
@@ -58,6 +64,48 @@ router.get('/cumpleanos', async (_req: AuthenticatedRequest, res: Response): Pro
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Error';
     res.status(500).json({ error: message });
+  }
+});
+
+router.get('/shala/alumnos', async (_req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const alumnos = await getShalaAlumnos();
+    res.json(alumnos);
+  } catch (err: unknown) {
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Error' });
+  }
+});
+
+router.get('/shala/leads', async (_req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const leads = await getShalaLeads();
+    res.json(leads);
+  } catch (err: unknown) {
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Error' });
+  }
+});
+
+router.get('/shala/exportar/alumnos', async (_req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const buffer = await exportShalaAlumnosToExcel();
+    const fecha = new Date().toISOString().split('T')[0];
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="shala-alumnos-${fecha}.xlsx"`);
+    res.send(buffer);
+  } catch (err: unknown) {
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Error' });
+  }
+});
+
+router.get('/shala/exportar/leads', async (_req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const buffer = await exportShalaLeadsToExcel();
+    const fecha = new Date().toISOString().split('T')[0];
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="shala-leads-${fecha}.xlsx"`);
+    res.send(buffer);
+  } catch (err: unknown) {
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Error' });
   }
 });
 
