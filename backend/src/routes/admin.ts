@@ -13,6 +13,10 @@ import {
   exportShalaAlumnosToExcel,
   exportShalaLeadsToExcel,
 } from '../services/shala-admin.service';
+import {
+  getAyurvedaAlumnos,
+  exportAyurvedaAlumnosToExcel,
+} from '../services/ayurveda-admin.service';
 
 const router = Router();
 
@@ -103,6 +107,30 @@ router.get('/shala/exportar/leads', async (_req: AuthenticatedRequest, res: Resp
     const fecha = new Date().toISOString().split('T')[0];
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.setHeader('Content-Disposition', `attachment; filename="shala-leads-${fecha}.xlsx"`);
+    res.send(buffer);
+  } catch (err: unknown) {
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Error' });
+  }
+});
+
+router.get('/ayurveda/alumnos', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const { generacion } = req.query as Record<string, string>;
+    const alumnos = await getAyurvedaAlumnos(generacion);
+    res.json(alumnos);
+  } catch (err: unknown) {
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Error' });
+  }
+});
+
+router.get('/ayurveda/exportar/:generacion', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const generacion = decodeURIComponent(req.params.generacion);
+    const buffer = await exportAyurvedaAlumnosToExcel(generacion);
+    const fecha = new Date().toISOString().split('T')[0];
+    const nombreArch = `ayurveda-${generacion.replace(/\s+/g, '-')}-${fecha}.xlsx`;
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="${nombreArch}"`);
     res.send(buffer);
   } catch (err: unknown) {
     res.status(500).json({ error: err instanceof Error ? err.message : 'Error' });
