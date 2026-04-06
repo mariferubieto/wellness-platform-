@@ -50,6 +50,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: '/admin/shala', label: 'SHALA' },
     { href: '/admin/shala/alumnos', label: '↳ Alumnos' },
     { href: '/admin/ayurveda', label: 'AYURVEDA' },
+    { href: '/admin/marifer', label: 'MARIFER' },
   ];
 
   return (
