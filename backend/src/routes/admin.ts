@@ -17,6 +17,12 @@ import {
   getAyurvedaAlumnos,
   exportAyurvedaAlumnosToExcel,
 } from '../services/ayurveda-admin.service';
+import {
+  getRetiroInscritos,
+  exportRetiroToExcel,
+  getEventoInscritos,
+  exportEventoToExcel,
+} from '../services/marifer-admin.service';
 
 const router = Router();
 
@@ -131,6 +137,48 @@ router.get('/ayurveda/exportar/:generacion', async (req: AuthenticatedRequest, r
     const nombreArch = `ayurveda-${generacion.replace(/\s+/g, '-')}-${fecha}.xlsx`;
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.setHeader('Content-Disposition', `attachment; filename="${nombreArch}"`);
+    res.send(buffer);
+  } catch (err: unknown) {
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Error' });
+  }
+});
+
+router.get('/retiros/:id/inscritos', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const inscritos = await getRetiroInscritos(req.params.id);
+    res.json(inscritos);
+  } catch (err: unknown) {
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Error' });
+  }
+});
+
+router.get('/exportar/retiro/:id', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const buffer = await exportRetiroToExcel(req.params.id);
+    const fecha = new Date().toISOString().split('T')[0];
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="retiro-inscritos-${fecha}.xlsx"`);
+    res.send(buffer);
+  } catch (err: unknown) {
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Error' });
+  }
+});
+
+router.get('/eventos/:id/inscritos', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const inscritos = await getEventoInscritos(req.params.id);
+    res.json(inscritos);
+  } catch (err: unknown) {
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Error' });
+  }
+});
+
+router.get('/exportar/evento/:id', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const buffer = await exportEventoToExcel(req.params.id);
+    const fecha = new Date().toISOString().split('T')[0];
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="evento-inscritos-${fecha}.xlsx"`);
     res.send(buffer);
   } catch (err: unknown) {
     res.status(500).json({ error: err instanceof Error ? err.message : 'Error' });
