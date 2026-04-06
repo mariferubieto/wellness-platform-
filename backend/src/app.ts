@@ -23,12 +23,14 @@ import usersRouter from './routes/users';
 import adminRouter from './routes/admin';
 import shalaRouter from './routes/shala/index';
 import ayurvedaRouter from './routes/ayurveda/index';
+import retirosRouter from './routes/retiros/index';
 
 app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/shala', shalaRouter);
 app.use('/api/ayurveda', ayurvedaRouter);
+app.use('/api/retiros', retirosRouter);
 
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error(err.stack);
