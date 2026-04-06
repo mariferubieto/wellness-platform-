@@ -49,6 +49,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: '/admin/crm', label: 'CRM' },
     { href: '/admin/shala', label: 'SHALA' },
     { href: '/admin/shala/alumnos', label: '↳ Alumnos' },
+    { href: '/admin/ayurveda', label: 'AYURVEDA' },
   ];
 
   return (
