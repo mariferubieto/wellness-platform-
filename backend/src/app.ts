@@ -25,6 +25,8 @@ import shalaRouter from './routes/shala/index';
 import ayurvedaRouter from './routes/ayurveda/index';
 import retirosRouter from './routes/retiros/index';
 import eventosRouter from './routes/eventos/index';
+import contenidoRouter from './routes/contenido/index';
+import newsletterRouter from './routes/newsletter/index';
 
 app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
@@ -33,6 +35,8 @@ app.use('/api/shala', shalaRouter);
 app.use('/api/ayurveda', ayurvedaRouter);
 app.use('/api/retiros', retirosRouter);
 app.use('/api/eventos', eventosRouter);
+app.use('/api/contenido', contenidoRouter);
+app.use('/api/newsletter', newsletterRouter);
 
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error(err.stack);
