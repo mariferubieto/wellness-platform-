@@ -27,6 +27,7 @@ export async function cancelarSuscripcion(email: string) {
     .select()
     .single();
   if (error) throw new Error(error.message);
+  if (!data) throw new Error('Email no encontrado');
   return data;
 }
 

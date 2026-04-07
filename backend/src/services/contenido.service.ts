@@ -21,7 +21,8 @@ export async function getPostBySlug(slug: string) {
     .eq('slug', slug)
     .eq('publicado', true)
     .single();
-  if (error) throw new Error('Post no encontrado');
+  if (error) throw new Error(error.message);
+  if (!data) throw new Error('Post no encontrado');
   return data;
 }
 
