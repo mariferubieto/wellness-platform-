@@ -83,6 +83,7 @@ export default function AdminContenidoPage() {
 
   async function handleCreatePost(e: React.FormEvent) {
     e.preventDefault();
+    setError('');
     setSavingPost(true);
     try {
       const { titulo, slug, contenido, imagen_url, tags } = newPost;
@@ -103,6 +104,7 @@ export default function AdminContenidoPage() {
   }
 
   async function handleTogglePost(post: Post) {
+    setError('');
     try {
       const updated = await api.patch<Post>(`/api/contenido/posts/${post.id}`, { publicado: !post.publicado });
       setPosts(prev => prev.map(p => p.id === post.id ? updated : p));
@@ -113,6 +115,7 @@ export default function AdminContenidoPage() {
 
   async function handleCreateVideo(e: React.FormEvent) {
     e.preventDefault();
+    setError('');
     setSavingVideo(true);
     try {
       const { titulo, url_video, tipo, descripcion, thumbnail_url, gratis } = newVideo;
@@ -134,6 +137,7 @@ export default function AdminContenidoPage() {
   }
 
   async function handleToggleVideo(video: Video) {
+    setError('');
     try {
       const updated = await api.patch<Video>(`/api/contenido/videos/${video.id}`, { publicado: !video.publicado });
       setVideos(prev => prev.map(v => v.id === video.id ? updated : v));
@@ -220,8 +224,9 @@ export default function AdminContenidoPage() {
                 <form onSubmit={handleCreatePost}>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div>
-                      <label className="label-wellness block mb-2">Título</label>
+                      <label htmlFor="post-titulo" className="label-wellness block mb-2">Título</label>
                       <input
+                        id="post-titulo"
                         type="text"
                         required
                         value={newPost.titulo}
@@ -231,8 +236,9 @@ export default function AdminContenidoPage() {
                       />
                     </div>
                     <div>
-                      <label className="label-wellness block mb-2">Slug</label>
+                      <label htmlFor="post-slug" className="label-wellness block mb-2">Slug</label>
                       <input
+                        id="post-slug"
                         type="text"
                         required
                         value={newPost.slug}
@@ -242,9 +248,10 @@ export default function AdminContenidoPage() {
                       />
                     </div>
                     <div>
-                      <label className="label-wellness block mb-2">Imagen URL</label>
+                      <label htmlFor="post-imagen-url" className="label-wellness block mb-2">Imagen URL</label>
                       <input
-                        type="text"
+                        id="post-imagen-url"
+                        type="url"
                         value={newPost.imagen_url}
                         onChange={e => setNewPost(p => ({ ...p, imagen_url: e.target.value }))}
                         className="input-wellness w-full"
@@ -252,8 +259,9 @@ export default function AdminContenidoPage() {
                       />
                     </div>
                     <div>
-                      <label className="label-wellness block mb-2">Tags (separadas por coma)</label>
+                      <label htmlFor="post-tags" className="label-wellness block mb-2">Tags (separadas por coma)</label>
                       <input
+                        id="post-tags"
                         type="text"
                         value={newPost.tags}
                         onChange={e => setNewPost(p => ({ ...p, tags: e.target.value }))}
@@ -263,8 +271,9 @@ export default function AdminContenidoPage() {
                     </div>
                   </div>
                   <div className="mb-4">
-                    <label className="label-wellness block mb-2">Contenido</label>
+                    <label htmlFor="post-contenido" className="label-wellness block mb-2">Contenido</label>
                     <textarea
+                      id="post-contenido"
                       required
                       value={newPost.contenido}
                       onChange={e => setNewPost(p => ({ ...p, contenido: e.target.value }))}
@@ -342,8 +351,9 @@ export default function AdminContenidoPage() {
                 <form onSubmit={handleCreateVideo}>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div>
-                      <label className="label-wellness block mb-2">Título</label>
+                      <label htmlFor="video-titulo" className="label-wellness block mb-2">Título</label>
                       <input
+                        id="video-titulo"
                         type="text"
                         required
                         value={newVideo.titulo}
@@ -353,9 +363,10 @@ export default function AdminContenidoPage() {
                       />
                     </div>
                     <div>
-                      <label className="label-wellness block mb-2">URL del Video</label>
+                      <label htmlFor="video-url" className="label-wellness block mb-2">URL del Video</label>
                       <input
-                        type="text"
+                        id="video-url"
+                        type="url"
                         required
                         value={newVideo.url_video}
                         onChange={e => setNewVideo(v => ({ ...v, url_video: e.target.value }))}
@@ -364,8 +375,9 @@ export default function AdminContenidoPage() {
                       />
                     </div>
                     <div>
-                      <label className="label-wellness block mb-2">Tipo</label>
+                      <label htmlFor="video-tipo" className="label-wellness block mb-2">Tipo</label>
                       <select
+                        id="video-tipo"
                         value={newVideo.tipo}
                         onChange={e => setNewVideo(v => ({ ...v, tipo: e.target.value as 'vlog' | 'mini_clase' }))}
                         className="px-4 py-2 bg-white border border-beige-lino rounded-wellness text-sm text-tierra focus:outline-none focus:border-sage w-full"
@@ -375,9 +387,10 @@ export default function AdminContenidoPage() {
                       </select>
                     </div>
                     <div>
-                      <label className="label-wellness block mb-2">Thumbnail URL</label>
+                      <label htmlFor="video-thumbnail" className="label-wellness block mb-2">Thumbnail URL</label>
                       <input
-                        type="text"
+                        id="video-thumbnail"
+                        type="url"
                         value={newVideo.thumbnail_url}
                         onChange={e => setNewVideo(v => ({ ...v, thumbnail_url: e.target.value }))}
                         className="input-wellness w-full"
@@ -386,8 +399,9 @@ export default function AdminContenidoPage() {
                     </div>
                   </div>
                   <div className="mb-4">
-                    <label className="label-wellness block mb-2">Descripción</label>
+                    <label htmlFor="video-descripcion" className="label-wellness block mb-2">Descripción</label>
                     <textarea
+                      id="video-descripcion"
                       value={newVideo.descripcion}
                       onChange={e => setNewVideo(v => ({ ...v, descripcion: e.target.value }))}
                       className="input-wellness w-full"
@@ -482,7 +496,7 @@ export default function AdminContenidoPage() {
                 <Button variant="primary" onClick={handleExportarNewsletter} loading={exportando}>
                   Exportar Excel
                 </Button>
-                <p className="text-tierra-light text-xs">{suscriptores.length} suscriptores activos</p>
+                <p className="text-tierra-light text-xs">{suscriptores.filter(s => s.activo).length} suscriptores activos</p>
               </div>
 
               {exportError && <p className="text-red-400 text-xs mb-4">{exportError}</p>}
