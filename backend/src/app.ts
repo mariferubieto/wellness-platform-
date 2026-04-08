@@ -27,6 +27,8 @@ import retirosRouter from './routes/retiros/index';
 import eventosRouter from './routes/eventos/index';
 import contenidoRouter from './routes/contenido/index';
 import newsletterRouter from './routes/newsletter/index';
+import pagosRouter from './routes/pagos/index';
+import behaviorRouter from './routes/behavior/index';
 
 app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
@@ -37,6 +39,8 @@ app.use('/api/retiros', retirosRouter);
 app.use('/api/eventos', eventosRouter);
 app.use('/api/contenido', contenidoRouter);
 app.use('/api/newsletter', newsletterRouter);
+app.use('/api/pagos', pagosRouter);
+app.use('/api/behavior', behaviorRouter);
 
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error(err.stack);
