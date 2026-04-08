@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import BehaviorTracker from '@/components/ui/BehaviorTracker';
 
 export const metadata: Metadata = {
   title: 'Shala · Manali Ayurveda · Bienestar',
@@ -10,6 +11,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es">
       <body className="min-h-screen bg-beige antialiased">
+        <BehaviorTracker />
         {children}
       </body>
     </html>
