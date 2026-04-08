@@ -3,6 +3,7 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
+import { iniciarPago } from '@/lib/pagos';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 
@@ -17,6 +18,9 @@ function InscripcionEventoForm() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const eventoId = searchParams.get('evento_id') ?? '';
+  const eventoPrecio = parseFloat(searchParams.get('precio') ?? '0');
+  const eventoNombre = searchParams.get('nombre') ?? 'Evento';
+  const tipoAcceso = searchParams.get('tipo_acceso') ?? 'gratis';
 
   const [evento, setEvento] = useState<Evento | null>(null);
   const [cargando, setCargando] = useState(true);
@@ -47,10 +51,18 @@ function InscripcionEventoForm() {
     setEnviando(true);
     try {
       await api.post('/api/eventos/inscripciones', { evento_id: eventoId, ...form });
-      setExito(true);
+      if (tipoAcceso === 'pago' && eventoPrecio > 0) {
+        await iniciarPago({
+          concepto: 'evento',
+          concepto_id: eventoId,
+          monto: eventoPrecio,
+          titulo: eventoNombre,
+        });
+      } else {
+        setExito(true);
+      }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Error al enviar');
-    } finally {
       setEnviando(false);
     }
   }

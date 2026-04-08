@@ -106,7 +106,7 @@ export default function EventoDetallePage() {
           <div className="space-y-3">
             {(evento.tipo_acceso === 'pago' || evento.tipo_acceso === 'gratis') && (
               <button
-                onClick={() => router.push(`/eventos/inscripcion?evento_id=${evento.id}`)}
+                onClick={() => router.push(`/eventos/inscripcion?evento_id=${evento.id}&precio=${evento.precio ?? 0}&nombre=${encodeURIComponent(evento.nombre)}&tipo_acceso=${evento.tipo_acceso}`)}
                 className="btn-primary w-full text-center"
               >
                 {evento.tipo_acceso === 'gratis' ? 'Inscribirme gratis' : 'Inscribirme'}

@@ -98,7 +98,7 @@ export default function RetiroDetallePage() {
 
           <div className="space-y-3">
             <button
-              onClick={() => router.push(`/retiros/inscripcion?retiro_id=${retiro.id}`)}
+              onClick={() => router.push(`/retiros/inscripcion?retiro_id=${retiro.id}&precio=${retiro.precio}&nombre=${encodeURIComponent(retiro.nombre)}`)}
               className="btn-primary w-full text-center"
             >
               Inscribirme

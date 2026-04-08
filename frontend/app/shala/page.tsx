@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import PaqueteCard from '@/components/shala/PaqueteCard';
+import { iniciarPago } from '@/lib/pagos';
 
 interface Paquete {
   id: string;
@@ -16,6 +17,24 @@ interface Paquete {
 export default function ShalaPage() {
   const [paquetes, setPaquetes] = useState<Paquete[]>([]);
   const [loading, setLoading] = useState(true);
+  const [pagandoId, setPagandoId] = useState<string | null>(null);
+  const [pagoError, setPagoError] = useState('');
+
+  async function handleComprar(paquete: { id: string; nombre: string; precio: number }) {
+    setPagandoId(paquete.id);
+    setPagoError('');
+    try {
+      await iniciarPago({
+        concepto: 'paquete_shala',
+        concepto_id: paquete.id,
+        monto: paquete.precio,
+        titulo: paquete.nombre,
+      });
+    } catch (err: unknown) {
+      setPagoError(err instanceof Error ? err.message : 'Error al iniciar pago');
+      setPagandoId(null);
+    }
+  }
 
   useEffect(() => {
     api.get<Paquete[]>('/api/shala/paquetes')
@@ -57,11 +76,21 @@ export default function ShalaPage() {
             <p className="text-center text-tierra-light text-sm">No hay paquetes disponibles por el momento</p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {paquetes.map(p => (
-                <PaqueteCard key={p.id} paquete={p} />
+              {paquetes.map(paquete => (
+                <div key={paquete.id} className="flex flex-col">
+                  <PaqueteCard paquete={paquete} />
+                  <button
+                    onClick={() => handleComprar(paquete)}
+                    disabled={pagandoId === paquete.id}
+                    className="btn-primary text-xs disabled:opacity-50 disabled:cursor-not-allowed mt-3"
+                  >
+                    {pagandoId === paquete.id ? 'Redirigiendo...' : 'Comprar'}
+                  </button>
+                </div>
               ))}
             </div>
           )}
+          {pagoError && <p className="text-red-400 text-xs text-center mt-4">{pagoError}</p>}
           <p className="text-center text-tierra-light text-xs mt-6">
             Para adquirir un paquete, contacta a tu maestra por WhatsApp o visítanos en el estudio.
           </p>

@@ -3,6 +3,7 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
+import { iniciarPago } from '@/lib/pagos';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 
@@ -17,6 +18,8 @@ function InscripcionRetiroForm() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const retiroId = searchParams.get('retiro_id') ?? '';
+  const retiroPrecio = parseFloat(searchParams.get('precio') ?? '0');
+  const retiroNombre = searchParams.get('nombre') ?? 'Retiro';
 
   const [retiro, setRetiro] = useState<Retiro | null>(null);
   const [cargando, setCargando] = useState(true);
@@ -56,10 +59,14 @@ function InscripcionRetiroForm() {
     setEnviando(true);
     try {
       await api.post('/api/retiros/inscripciones', { retiro_id: retiroId, ...form });
-      setExito(true);
+      await iniciarPago({
+        concepto: 'retiro',
+        concepto_id: retiroId,
+        monto: retiroPrecio,
+        titulo: retiroNombre,
+      });
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Error al enviar');
-    } finally {
       setEnviando(false);
     }
   }

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
+import { iniciarPago } from '@/lib/pagos';
 
 interface Diplomado {
   id: string;
@@ -21,6 +22,25 @@ export default function DiplomadoDetallePage() {
   const [diplomado, setDiplomado] = useState<Diplomado | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [pagando, setPagando] = useState(false);
+  const [pagoError, setPagoError] = useState('');
+
+  async function handleInscribirse() {
+    if (!diplomado) return;
+    setPagando(true);
+    setPagoError('');
+    try {
+      await iniciarPago({
+        concepto: 'diplomado',
+        concepto_id: diplomado.id,
+        monto: diplomado.precio,
+        titulo: diplomado.nombre,
+      });
+    } catch (err: unknown) {
+      setPagoError(err instanceof Error ? err.message : 'Error al iniciar pago');
+      setPagando(false);
+    }
+  }
 
   useEffect(() => {
     api.get<Diplomado>(`/api/ayurveda/diplomados/${id}`)
@@ -109,11 +129,13 @@ export default function DiplomadoDetallePage() {
             </div>
           </div>
           <button
-            onClick={() => router.push(`/ayurveda/inscripcion?diplomado_id=${diplomado.id}`)}
-            className="btn-primary w-full text-center"
+            onClick={handleInscribirse}
+            disabled={pagando}
+            className="btn-primary w-full text-center disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Inscribirme
+            {pagando ? 'Redirigiendo a pago...' : 'Inscribirme'}
           </button>
+          {pagoError && <p className="text-red-400 text-xs text-center mt-2">{pagoError}</p>}
           <p className="text-tierra-light text-xs text-center mt-4">
             Recibirás confirmación por WhatsApp una vez validado tu pago.
           </p>
