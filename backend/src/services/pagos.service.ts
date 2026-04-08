@@ -133,24 +133,33 @@ async function activarCompra(pago: {
   }
 
   if (pago.concepto === 'diplomado') {
-    await supabaseAdmin
+    let q = supabaseAdmin
       .from('inscripciones_diplomado')
       .update({ estado_pago: 'completado', pago_id: pago.id })
-      .eq('pago_id', pago.id);
+      .eq('diplomado_id', pago.concepto_id)
+      .eq('estado_pago', 'pendiente');
+    if (pago.user_id) q = q.eq('user_id', pago.user_id);
+    await q;
   }
 
   if (pago.concepto === 'retiro') {
-    await supabaseAdmin
+    let q = supabaseAdmin
       .from('inscripciones_retiro')
       .update({ estado_pago: 'completado', pago_id: pago.id })
-      .eq('pago_id', pago.id);
+      .eq('retiro_id', pago.concepto_id)
+      .eq('estado_pago', 'pendiente');
+    if (pago.user_id) q = q.eq('user_id', pago.user_id);
+    await q;
   }
 
   if (pago.concepto === 'evento') {
-    await supabaseAdmin
+    let q = supabaseAdmin
       .from('inscripciones_evento')
-      .update({ pago_id: pago.id })
-      .eq('pago_id', pago.id);
+      .update({ estado_pago: 'completado', pago_id: pago.id })
+      .eq('evento_id', pago.concepto_id)
+      .eq('estado_pago', 'pendiente');
+    if (pago.user_id) q = q.eq('user_id', pago.user_id);
+    await q;
   }
 }
 
