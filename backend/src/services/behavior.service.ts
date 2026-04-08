@@ -19,7 +19,7 @@ export async function logEvent(params: {
   user_id?: string;
   lead_id?: string;
 }): Promise<void> {
-  await supabaseAdmin.from('behavior_events').insert({
+  const { error: insertError } = await supabaseAdmin.from('behavior_events').insert({
     tipo: params.tipo,
     pagina: params.pagina ?? null,
     accion: params.accion ?? null,
@@ -27,6 +27,9 @@ export async function logEvent(params: {
     user_id: params.user_id ?? null,
     lead_id: params.lead_id ?? null,
   });
+
+  // Only apply tags if the event was persisted successfully
+  if (insertError) return;
 
   if (params.pagina) {
     const tag = getTagForPage(params.pagina);

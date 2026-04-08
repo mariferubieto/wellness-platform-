@@ -117,7 +117,10 @@ async function activarCompra(pago: {
       .eq('id', pago.concepto_id)
       .single();
 
-    if (!catalogo) return;
+    if (!catalogo) {
+      console.error(`activarCompra: paquetes_catalogo no encontrado para concepto_id=${pago.concepto_id}, pago_id=${pago.id}`);
+      return;
+    }
 
     const expira = new Date();
     expira.setDate(expira.getDate() + (catalogo.vigencia_dias ?? 30));
@@ -163,12 +166,15 @@ async function activarCompra(pago: {
   }
 }
 
-export async function getEstadoPago(pagoId: string) {
-  const { data, error } = await supabaseAdmin
+export async function getEstadoPago(pagoId: string, userId?: string) {
+  let query = supabaseAdmin
     .from('pagos')
-    .select('id, estado, concepto, monto, created_at')
-    .eq('id', pagoId)
-    .single();
-  if (error) throw new Error('Pago no encontrado');
+    .select('id, estado, concepto, monto, created_at, user_id')
+    .eq('id', pagoId);
+
+  if (userId) query = query.eq('user_id', userId);
+
+  const { data, error } = await query.single();
+  if (error || !data) throw new Error('Pago no encontrado');
   return data;
 }
