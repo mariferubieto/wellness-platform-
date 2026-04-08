@@ -66,6 +66,18 @@ describe('GET /api/admin/dashboard', () => {
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockResolvedValue({ count: 8, error: null }),
         }),
+      })
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        gte: jest.fn().mockResolvedValue({ count: 3, error: null }),
+      })
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        gte: jest.fn().mockReturnThis(),
+        order: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockResolvedValue({ data: [], error: null }),
       });
 
     const res = await request(app)

@@ -2,23 +2,37 @@ import { supabaseAdmin } from '../config/supabase';
 import * as XLSX from 'xlsx';
 
 export async function getDashboardMetrics() {
-  const { count: total_usuarios } = await supabaseAdmin
-    .from('users')
-    .select('*', { count: 'exact', head: true });
+  const inicioMes = new Date();
+  inicioMes.setDate(1);
+  inicioMes.setHours(0, 0, 0, 0);
 
-  const { count: total_leads } = await supabaseAdmin
-    .from('leads')
-    .select('*', { count: 'exact', head: true });
-
-  const { count: leads_nuevos } = await supabaseAdmin
-    .from('leads')
-    .select('*', { count: 'exact', head: true })
-    .eq('estado', 'nuevo');
+  const [
+    { count: total_usuarios },
+    { count: total_leads },
+    { count: leads_nuevos },
+    { count: ventas_mes },
+    { data: proximos_eventos },
+  ] = await Promise.all([
+    supabaseAdmin.from('users').select('*', { count: 'exact', head: true }),
+    supabaseAdmin.from('leads').select('*', { count: 'exact', head: true }),
+    supabaseAdmin.from('leads').select('*', { count: 'exact', head: true }).eq('estado', 'nuevo'),
+    supabaseAdmin.from('pagos').select('*', { count: 'exact', head: true })
+      .eq('estado', 'aprobado')
+      .gte('created_at', inicioMes.toISOString()),
+    supabaseAdmin.from('eventos')
+      .select('id, nombre, fecha, tipo_acceso')
+      .eq('activo', true)
+      .gte('fecha', new Date().toISOString())
+      .order('fecha', { ascending: true })
+      .limit(3),
+  ]);
 
   return {
     total_usuarios: total_usuarios ?? 0,
     total_leads: total_leads ?? 0,
     leads_nuevos: leads_nuevos ?? 0,
+    ventas_mes: ventas_mes ?? 0,
+    proximos_eventos: proximos_eventos ?? [],
   };
 }
 
