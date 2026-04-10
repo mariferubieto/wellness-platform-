@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import BehaviorTracker from '@/components/ui/BehaviorTracker';
 import Navbar from '@/components/ui/Navbar';
-import { Playfair_Display, Josefin_Sans, Fredoka_One, EB_Garamond } from 'next/font/google';
+import { Playfair_Display, Josefin_Sans, Fredoka, EB_Garamond } from 'next/font/google';
 
 const playfair = Playfair_Display({
   subsets: ['latin'],
@@ -18,7 +18,7 @@ const josefin = Josefin_Sans({
   display: 'swap',
 });
 
-const fredoka = Fredoka_One({
+const fredoka = Fredoka({
   subsets: ['latin'],
   variable: '--font-fredoka',
   weight: '400',
