@@ -1,5 +1,15 @@
 import { supabaseAdmin } from '../config/supabase';
 
+export async function createPaqueteCatalogo(input: { nombre: string; num_clases: number; precio: number; vigencia_dias: number }) {
+  const { data, error } = await supabaseAdmin
+    .from('paquetes_catalogo')
+    .insert(input)
+    .select()
+    .single();
+  if (error) throw new Error(error.message);
+  return data;
+}
+
 export async function getPaquetesCatalogo() {
   const { data, error } = await supabaseAdmin
     .from('paquetes_catalogo')

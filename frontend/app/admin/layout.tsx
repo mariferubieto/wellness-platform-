@@ -52,6 +52,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: '/admin/ayurveda', label: 'AYURVEDA' },
     { href: '/admin/marifer', label: 'MARIFER' },
     { href: '/admin/contenido', label: 'CONTENIDO' },
+    { href: '/admin/codigos', label: 'CÓDIGOS PROMO' },
   ];
 
   return (
