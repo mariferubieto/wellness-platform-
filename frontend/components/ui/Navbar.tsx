@@ -7,11 +7,27 @@ import { createSupabaseClient } from '@/lib/supabase';
 import { api } from '@/lib/api';
 
 const NAV_ITEMS = [
-  { label: 'Shala', href: '/shala' },
-  { label: 'Ayurveda', href: '/ayurveda' },
-  { label: 'Retiros', href: '/retiros' },
-  { label: 'Eventos', href: '/eventos' },
-  { label: 'Biblioteca', href: '/contenido' },
+  {
+    label: 'Shala',
+    href: '/shala',
+    style: { fontFamily: 'var(--font-playfair)', fontWeight: 700, fontSize: '1rem', letterSpacing: '0.05em', textTransform: 'uppercase' as const },
+  },
+  {
+    label: 'Ayurveda',
+    href: '/ayurveda',
+    style: { fontFamily: 'var(--font-cormorant)', fontWeight: 400, fontStyle: 'italic', fontSize: '1.05rem', letterSpacing: '0.02em' },
+  },
+  {
+    label: 'Retiros · Eventos',
+    href: '/retiros',
+    activeHrefs: ['/retiros', '/eventos'],
+    style: { fontFamily: 'var(--font-raleway)', fontWeight: 500, fontSize: '0.8rem', letterSpacing: '0.15em', textTransform: 'uppercase' as const },
+  },
+  {
+    label: 'Biblioteca',
+    href: '/contenido',
+    style: { fontFamily: 'var(--font-eb-garamond)', fontWeight: 400, fontSize: '1rem', letterSpacing: '0.04em' },
+  },
 ];
 
 const HIDDEN_PATHS = ['/login', '/registro', '/primer-acceso'];
@@ -31,25 +47,29 @@ export default function Navbar() {
 
   if (HIDDEN_PATHS.includes(pathname)) return null;
 
-  const isActive = (href: string) => pathname.startsWith(href);
+  const isActive = (item: typeof NAV_ITEMS[0]) => {
+    const hrefs = 'activeHrefs' in item ? item.activeHrefs! : [item.href];
+    return hrefs.some(h => pathname.startsWith(h));
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-beige border-b border-sand/40">
-      <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
+      <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-6">
         {/* Logo */}
-        <Link href="/shala" className="text-sm tracking-[0.2em] uppercase text-tierra font-medium">
+        <Link href="/shala" className="text-sm tracking-[0.2em] uppercase text-tierra font-medium shrink-0">
           Wellness
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-1">
+        <nav className="hidden md:flex items-center gap-6">
           {NAV_ITEMS.map(item => (
             <Link
               key={item.href}
               href={item.href}
-              className={`px-4 py-1.5 text-xs tracking-widest uppercase transition-colors rounded-sm ${
-                isActive(item.href)
-                  ? 'text-tierra bg-sand/40 font-medium'
+              style={item.style}
+              className={`transition-colors pb-0.5 ${
+                isActive(item)
+                  ? 'text-tierra border-b border-sand'
                   : 'text-tierra-light hover:text-tierra'
               }`}
             >
@@ -59,10 +79,8 @@ export default function Navbar() {
           {rol === 'admin' && (
             <Link
               href="/admin"
-              className={`px-4 py-1.5 text-xs tracking-widest uppercase transition-colors rounded-sm ${
-                isActive('/admin')
-                  ? 'text-tierra bg-sand/40 font-medium'
-                  : 'text-tierra-light hover:text-tierra'
+              className={`text-xs tracking-widest uppercase transition-colors ${
+                pathname.startsWith('/admin') ? 'text-tierra font-medium' : 'text-tierra-light hover:text-tierra'
               }`}
             >
               Admin
@@ -73,8 +91,8 @@ export default function Navbar() {
         {/* Perfil */}
         <Link
           href="/perfil"
-          className={`text-xs tracking-widest uppercase transition-colors ${
-            isActive('/perfil') ? 'text-tierra font-medium' : 'text-tierra-light hover:text-tierra'
+          className={`hidden md:block text-xs tracking-widest uppercase transition-colors shrink-0 ${
+            pathname.startsWith('/perfil') ? 'text-tierra font-medium' : 'text-tierra-light hover:text-tierra'
           }`}
         >
           Mi perfil
@@ -82,7 +100,7 @@ export default function Navbar() {
 
         {/* Mobile hamburger */}
         <button
-          className="md:hidden ml-4 text-tierra-light"
+          className="md:hidden ml-auto text-tierra-light"
           onClick={() => setMenuOpen(prev => !prev)}
           aria-label="Menú"
         >
@@ -92,15 +110,14 @@ export default function Navbar() {
 
       {/* Mobile menu */}
       {menuOpen && (
-        <div className="md:hidden bg-beige border-t border-sand/40 px-4 py-3 flex flex-col gap-2">
+        <div className="md:hidden bg-beige border-t border-sand/40 px-4 py-4 flex flex-col gap-4">
           {NAV_ITEMS.map(item => (
             <Link
               key={item.href}
               href={item.href}
               onClick={() => setMenuOpen(false)}
-              className={`text-xs tracking-widest uppercase py-2 transition-colors ${
-                isActive(item.href) ? 'text-tierra font-medium' : 'text-tierra-light'
-              }`}
+              style={item.style}
+              className={`py-1 transition-colors ${isActive(item) ? 'text-tierra' : 'text-tierra-light'}`}
             >
               {item.label}
             </Link>
@@ -109,7 +126,7 @@ export default function Navbar() {
             <Link
               href="/admin"
               onClick={() => setMenuOpen(false)}
-              className="text-xs tracking-widest uppercase py-2 text-tierra-light"
+              className="text-xs tracking-widest uppercase py-1 text-tierra-light"
             >
               Admin
             </Link>
@@ -117,7 +134,7 @@ export default function Navbar() {
           <Link
             href="/perfil"
             onClick={() => setMenuOpen(false)}
-            className="text-xs tracking-widest uppercase py-2 text-tierra-light"
+            className="text-xs tracking-widest uppercase py-1 text-tierra-light"
           >
             Mi perfil
           </Link>
