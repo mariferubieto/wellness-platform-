@@ -20,7 +20,7 @@ const NAV_ITEMS = [
   {
     label: 'Retiros',
     href: '/retiros',
-    style: { fontFamily: 'var(--font-raleway)', fontWeight: 500, fontSize: '0.8rem', letterSpacing: '0.15em', textTransform: 'uppercase' as const },
+    style: { fontFamily: 'var(--font-fredoka)', fontWeight: 400, fontSize: '0.95rem', letterSpacing: '0.05em' },
   },
   {
     label: 'Biblioteca',

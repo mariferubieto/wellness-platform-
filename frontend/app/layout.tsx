@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import BehaviorTracker from '@/components/ui/BehaviorTracker';
 import Navbar from '@/components/ui/Navbar';
-import { Playfair_Display, Josefin_Sans, Raleway, EB_Garamond } from 'next/font/google';
+import { Playfair_Display, Josefin_Sans, Fredoka_One, EB_Garamond } from 'next/font/google';
 
 const playfair = Playfair_Display({
   subsets: ['latin'],
@@ -18,9 +18,10 @@ const josefin = Josefin_Sans({
   display: 'swap',
 });
 
-const raleway = Raleway({
+const fredoka = Fredoka_One({
   subsets: ['latin'],
-  variable: '--font-raleway',
+  variable: '--font-fredoka',
+  weight: '400',
   display: 'swap',
 });
 
@@ -37,7 +38,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={`${playfair.variable} ${josefin.variable} ${raleway.variable} ${ebGaramond.variable}`}>
+    <html lang="es" className={`${playfair.variable} ${josefin.variable} ${fredoka.variable} ${ebGaramond.variable}`}>
       <body className="min-h-screen bg-beige antialiased">
         <BehaviorTracker />
         <Navbar />
