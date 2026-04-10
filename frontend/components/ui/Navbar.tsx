@@ -10,17 +10,16 @@ const NAV_ITEMS = [
   {
     label: 'Shala',
     href: '/shala',
-    style: { fontFamily: 'var(--font-playfair)', fontWeight: 700, fontSize: '1rem', letterSpacing: '0.05em', textTransform: 'uppercase' as const },
+    style: { fontFamily: 'var(--font-playfair)', fontWeight: 900, fontSize: '1.05rem', letterSpacing: '0.08em', textTransform: 'uppercase' as const },
   },
   {
     label: 'Ayurveda',
     href: '/ayurveda',
-    style: { fontFamily: 'var(--font-cormorant)', fontWeight: 400, fontStyle: 'italic', fontSize: '1.05rem', letterSpacing: '0.02em' },
+    style: { fontFamily: 'var(--font-josefin)', fontWeight: 300, fontSize: '0.85rem', letterSpacing: '0.35em', textTransform: 'uppercase' as const },
   },
   {
-    label: 'Retiros · Eventos',
+    label: 'Retiros',
     href: '/retiros',
-    activeHrefs: ['/retiros', '/eventos'],
     style: { fontFamily: 'var(--font-raleway)', fontWeight: 500, fontSize: '0.8rem', letterSpacing: '0.15em', textTransform: 'uppercase' as const },
   },
   {
@@ -47,21 +46,16 @@ export default function Navbar() {
 
   if (HIDDEN_PATHS.includes(pathname)) return null;
 
-  const isActive = (item: typeof NAV_ITEMS[0]) => {
-    const hrefs = 'activeHrefs' in item ? item.activeHrefs! : [item.href];
-    return hrefs.some(h => pathname.startsWith(h));
-  };
+  const isActive = (item: typeof NAV_ITEMS[0]) => pathname.startsWith(item.href);
 
   return (
     <header className="sticky top-0 z-50 bg-beige border-b border-sand/40">
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-6">
-        {/* Logo */}
         <Link href="/shala" className="text-sm tracking-[0.2em] uppercase text-tierra font-medium shrink-0">
           Wellness
         </Link>
 
-        {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-6">
+        <nav className="hidden md:flex items-center gap-7">
           {NAV_ITEMS.map(item => (
             <Link
               key={item.href}
@@ -88,7 +82,6 @@ export default function Navbar() {
           )}
         </nav>
 
-        {/* Perfil */}
         <Link
           href="/perfil"
           className={`hidden md:block text-xs tracking-widest uppercase transition-colors shrink-0 ${
@@ -98,7 +91,6 @@ export default function Navbar() {
           Mi perfil
         </Link>
 
-        {/* Mobile hamburger */}
         <button
           className="md:hidden ml-auto text-tierra-light"
           onClick={() => setMenuOpen(prev => !prev)}
@@ -108,7 +100,6 @@ export default function Navbar() {
         </button>
       </div>
 
-      {/* Mobile menu */}
       {menuOpen && (
         <div className="md:hidden bg-beige border-t border-sand/40 px-4 py-4 flex flex-col gap-4">
           {NAV_ITEMS.map(item => (
@@ -123,21 +114,9 @@ export default function Navbar() {
             </Link>
           ))}
           {rol === 'admin' && (
-            <Link
-              href="/admin"
-              onClick={() => setMenuOpen(false)}
-              className="text-xs tracking-widest uppercase py-1 text-tierra-light"
-            >
-              Admin
-            </Link>
+            <Link href="/admin" onClick={() => setMenuOpen(false)} className="text-xs tracking-widest uppercase py-1 text-tierra-light">Admin</Link>
           )}
-          <Link
-            href="/perfil"
-            onClick={() => setMenuOpen(false)}
-            className="text-xs tracking-widest uppercase py-1 text-tierra-light"
-          >
-            Mi perfil
-          </Link>
+          <Link href="/perfil" onClick={() => setMenuOpen(false)} className="text-xs tracking-widest uppercase py-1 text-tierra-light">Mi perfil</Link>
         </div>
       )}
     </header>

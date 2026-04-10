@@ -2,19 +2,19 @@ import type { Metadata } from 'next';
 import './globals.css';
 import BehaviorTracker from '@/components/ui/BehaviorTracker';
 import Navbar from '@/components/ui/Navbar';
-import { Playfair_Display, Cormorant_Garamond, Raleway, EB_Garamond } from 'next/font/google';
+import { Playfair_Display, Josefin_Sans, Raleway, EB_Garamond } from 'next/font/google';
 
 const playfair = Playfair_Display({
   subsets: ['latin'],
   variable: '--font-playfair',
+  weight: ['700', '800', '900'],
   display: 'swap',
 });
 
-const cormorant = Cormorant_Garamond({
+const josefin = Josefin_Sans({
   subsets: ['latin'],
-  variable: '--font-cormorant',
-  weight: ['300', '400', '500'],
-  style: ['normal', 'italic'],
+  variable: '--font-josefin',
+  weight: ['100', '200', '300'],
   display: 'swap',
 });
 
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={`${playfair.variable} ${cormorant.variable} ${raleway.variable} ${ebGaramond.variable}`}>
+    <html lang="es" className={`${playfair.variable} ${josefin.variable} ${raleway.variable} ${ebGaramond.variable}`}>
       <body className="min-h-screen bg-beige antialiased">
         <BehaviorTracker />
         <Navbar />
@@ -46,3 +46,4 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </html>
   );
 }
+
