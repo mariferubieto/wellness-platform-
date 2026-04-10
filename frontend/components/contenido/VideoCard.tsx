@@ -8,11 +8,37 @@ interface Video {
   thumbnail_url?: string;
 }
 
+function getYouTubeEmbedUrl(url: string): string | null {
+  try {
+    const u = new URL(url);
+    let videoId: string | null = null;
+    if (u.hostname.includes('youtu.be')) {
+      videoId = u.pathname.slice(1);
+    } else if (u.hostname.includes('youtube.com')) {
+      videoId = u.searchParams.get('v');
+    }
+    if (!videoId) return null;
+    return `https://www.youtube.com/embed/${videoId}`;
+  } catch {
+    return null;
+  }
+}
+
 export default function VideoCard({ video }: { video: Video }) {
+  const embedUrl = getYouTubeEmbedUrl(video.url_video);
+
   return (
     <div className="card-wellness flex flex-col">
       <div className="aspect-video bg-sage-muted mb-4 overflow-hidden -mx-6 -mt-6 relative">
-        {video.thumbnail_url ? (
+        {embedUrl ? (
+          <iframe
+            src={embedUrl}
+            title={video.titulo}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            className="w-full h-full"
+          />
+        ) : video.thumbnail_url ? (
           <img
             src={video.thumbnail_url}
             alt={video.titulo}
@@ -36,16 +62,18 @@ export default function VideoCard({ video }: { video: Video }) {
           <p className="text-tierra-light text-sm leading-relaxed line-clamp-2">{video.descripcion}</p>
         )}
       </div>
-      <div className="mt-4 pt-4 border-t border-beige-lino">
-        <a
-          href={video.url_video}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn-primary text-xs block text-center"
-        >
-          Ver video
-        </a>
-      </div>
+      {!embedUrl && (
+        <div className="mt-4 pt-4 border-t border-beige-lino">
+          <a
+            href={video.url_video}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-primary text-xs block text-center"
+          >
+            Ver video
+          </a>
+        </div>
+      )}
     </div>
   );
 }
