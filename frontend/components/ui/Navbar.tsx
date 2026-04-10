@@ -11,7 +11,7 @@ const NAV_ITEMS = [
   { label: 'Ayurveda', href: '/ayurveda' },
   { label: 'Retiros', href: '/retiros' },
   { label: 'Eventos', href: '/eventos' },
-  { label: 'Contenido', href: '/contenido' },
+  { label: 'Biblioteca', href: '/contenido' },
 ];
 
 const HIDDEN_PATHS = ['/login', '/registro', '/primer-acceso'];
