@@ -71,11 +71,6 @@ export default function LoginPage() {
               Regístrate aquí
             </Link>
           </p>
-          <p className="text-sm text-tierra-light">
-            <Link href="/primer-acceso" className="text-sage hover:underline">
-              Soy alumna de Nessty y es mi primer acceso
-            </Link>
-          </p>
         </div>
       </div>
     </div>

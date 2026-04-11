@@ -21,19 +21,15 @@ export async function middleware(request: NextRequest) {
   );
 
   const { data: { user } } = await supabase.auth.getUser();
+  const path = request.nextUrl.pathname;
 
-  const protectedPaths = ['/perfil', '/admin'];
-  const isProtected = protectedPaths.some(p => request.nextUrl.pathname.startsWith(p));
-
-  if (isProtected && !user) {
+  const protectedPaths = ['/perfil', '/mis-paquetes', '/admin'];
+  if (protectedPaths.some(p => path.startsWith(p)) && !user) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  const authPaths = ['/login', '/registro'];
-  const isAuthPage = authPaths.includes(request.nextUrl.pathname);
-
-  if (isAuthPage && user) {
-    return NextResponse.redirect(new URL('/perfil', request.url));
+  if ((path === '/login' || path === '/registro') && user) {
+    return NextResponse.redirect(new URL('/calendario', request.url));
   }
 
   return response;

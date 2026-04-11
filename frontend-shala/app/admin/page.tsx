@@ -87,12 +87,10 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="mt-10 grid grid-cols-2 md:grid-cols-2 gap-4">
             {[
               { href: '/admin/shala', label: 'Gestionar SHALA' },
-              { href: '/admin/ayurveda', label: 'Ver AYURVEDA' },
-              { href: '/admin/marifer', label: 'Ver MARIFER' },
-              { href: '/admin/contenido', label: 'Gestionar Contenido' },
+              { href: '/admin/codigos', label: 'Códigos Promo' },
             ].map(link => (
               <Link key={link.href} href={link.href} className="btn-secondary text-center text-xs">
                 {link.label}

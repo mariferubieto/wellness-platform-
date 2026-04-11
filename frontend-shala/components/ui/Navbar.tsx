@@ -7,29 +7,11 @@ import { createSupabaseClient } from '@/lib/supabase';
 import { api } from '@/lib/api';
 
 const NAV_ITEMS = [
-  {
-    label: 'Shala',
-    href: '/shala',
-    style: { fontFamily: 'var(--font-playfair)', fontWeight: 900, fontSize: '1.05rem', letterSpacing: '0.08em', textTransform: 'uppercase' as const },
-  },
-  {
-    label: 'Ayurveda',
-    href: '/ayurveda',
-    style: { fontFamily: 'var(--font-josefin)', fontWeight: 300, fontSize: '0.85rem', letterSpacing: '0.35em', textTransform: 'uppercase' as const },
-  },
-  {
-    label: 'Retiros',
-    href: '/retiros',
-    style: { fontFamily: 'var(--font-fredoka)', fontWeight: 400, fontSize: '0.95rem', letterSpacing: '0.05em' },
-  },
-  {
-    label: 'Biblioteca',
-    href: '/contenido',
-    style: { fontFamily: 'var(--font-eb-garamond)', fontWeight: 400, fontSize: '1rem', letterSpacing: '0.04em' },
-  },
+  { label: 'Calendario', href: '/calendario' },
+  { label: 'Mis Paquetes', href: '/mis-paquetes' },
 ];
 
-const HIDDEN_PATHS = ['/login', '/registro', '/primer-acceso'];
+const HIDDEN_PATHS = ['/login', '/registro'];
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -46,13 +28,15 @@ export default function Navbar() {
 
   if (HIDDEN_PATHS.includes(pathname)) return null;
 
-  const isActive = (item: typeof NAV_ITEMS[0]) => pathname.startsWith(item.href);
-
   return (
     <header className="sticky top-0 z-50 bg-beige border-b border-sand/40">
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-6">
-        <Link href="/shala" className="text-sm tracking-[0.2em] uppercase text-tierra font-medium shrink-0">
-          Wellness
+        <Link
+          href="/calendario"
+          className="text-sm tracking-[0.2em] uppercase text-tierra font-medium shrink-0"
+          style={{ fontFamily: 'var(--font-playfair)', fontWeight: 900, fontSize: '1.05rem', letterSpacing: '0.08em' }}
+        >
+          Shala
         </Link>
 
         <nav className="hidden md:flex items-center gap-7">
@@ -60,11 +44,8 @@ export default function Navbar() {
             <Link
               key={item.href}
               href={item.href}
-              style={item.style}
-              className={`transition-colors pb-0.5 ${
-                isActive(item)
-                  ? 'text-tierra border-b border-sand'
-                  : 'text-tierra-light hover:text-tierra'
+              className={`text-xs tracking-widest uppercase transition-colors ${
+                pathname.startsWith(item.href) ? 'text-tierra border-b border-sand' : 'text-tierra-light hover:text-tierra'
               }`}
             >
               {item.label}
@@ -107,8 +88,9 @@ export default function Navbar() {
               key={item.href}
               href={item.href}
               onClick={() => setMenuOpen(false)}
-              style={item.style}
-              className={`py-1 transition-colors ${isActive(item) ? 'text-tierra' : 'text-tierra-light'}`}
+              className={`text-xs tracking-widest uppercase py-1 transition-colors ${
+                pathname.startsWith(item.href) ? 'text-tierra' : 'text-tierra-light'
+              }`}
             >
               {item.label}
             </Link>
