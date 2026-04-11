@@ -7,21 +7,25 @@ export interface CreateClaseInput {
   inicio: string;
   fin: string;
   capacidad: number;
+  espacio_tipo?: 'salon' | 'jardin';
   tipo?: 'regular' | 'especial';
   precio_especial?: number;
 }
 
-export async function getClases(tipo?: string) {
-  const ahora = new Date().toISOString();
+export async function getClases(tipo?: string, desde?: string, hasta?: string) {
+  const ahora = desde ?? new Date().toISOString();
   let query = supabaseAdmin
     .from('clases')
-    .select('id, nombre, descripcion, inicio, fin, capacidad, cupo_actual, tipo, precio_especial, activo, maestros(id, users(nombre))')
+    .select('id, nombre, descripcion, inicio, fin, capacidad, cupo_actual, tipo, precio_especial, activo, espacio_tipo, maestros(id, users(nombre))')
     .eq('activo', true)
     .gte('inicio', ahora)
     .order('inicio');
 
   if (tipo) {
     query = query.eq('tipo', tipo);
+  }
+  if (hasta) {
+    query = query.lte('inicio', hasta);
   }
 
   const { data, error } = await query;
@@ -39,6 +43,7 @@ export async function createClase(input: CreateClaseInput) {
       inicio: input.inicio,
       fin: input.fin,
       capacidad: input.capacidad,
+      espacio_tipo: input.espacio_tipo ?? 'salon',
       tipo: input.tipo ?? 'regular',
       precio_especial: input.precio_especial ?? null,
     })
@@ -49,8 +54,30 @@ export async function createClase(input: CreateClaseInput) {
   return data;
 }
 
+export async function createClasesBatch(inputs: CreateClaseInput[]) {
+  const rows = inputs.map(input => ({
+    maestro_id: input.maestro_id ?? null,
+    nombre: input.nombre,
+    descripcion: input.descripcion ?? null,
+    inicio: input.inicio,
+    fin: input.fin,
+    capacidad: input.capacidad,
+    espacio_tipo: input.espacio_tipo ?? 'salon',
+    tipo: input.tipo ?? 'regular',
+    precio_especial: input.precio_especial ?? null,
+  }));
+
+  const { data, error } = await supabaseAdmin
+    .from('clases')
+    .insert(rows)
+    .select();
+
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
 export async function updateClase(id: string, updates: Partial<CreateClaseInput & { activo: boolean }>) {
-  const ALLOWED = ['maestro_id', 'nombre', 'descripcion', 'inicio', 'fin', 'capacidad', 'tipo', 'precio_especial', 'activo'];
+  const ALLOWED = ['maestro_id', 'nombre', 'descripcion', 'inicio', 'fin', 'capacidad', 'espacio_tipo', 'tipo', 'precio_especial', 'activo'];
   const filtered = Object.fromEntries(
     Object.entries(updates).filter(([k]) => ALLOWED.includes(k))
   );

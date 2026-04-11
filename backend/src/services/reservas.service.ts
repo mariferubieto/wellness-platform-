@@ -150,7 +150,7 @@ export async function cancelarReserva(reservaId: string, userId: string) {
 export async function getMisReservas(userId: string) {
   const { data, error } = await supabaseAdmin
     .from('reservas')
-    .select('id, estado, credito_devuelto, created_at, clases(id, nombre, inicio, fin, tipo)')
+    .select('id, estado, credito_devuelto, created_at, clases(id, nombre, inicio, fin, tipo, espacio_tipo)')
     .eq('user_id', userId)
     .order('created_at', { ascending: false });
 
