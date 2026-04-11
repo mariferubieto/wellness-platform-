@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    background-color: #F9F5EF;
+    color: #2C2418;
+  }
+  h1, h2, h3, h4 {
+    font-family: Georgia, serif;
+    font-weight: 400;
+  }
+}
+
+@layer components {
+  .btn-wellness {
+    @apply bg-sage text-white px-6 py-3 text-xs tracking-widest uppercase
+           rounded-wellness border border-sage hover:bg-sage-light
+           transition-colors duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-primary {
+    @apply bg-sage text-white px-6 py-3 text-xs tracking-widest uppercase
+           rounded-wellness border border-sage hover:bg-sage-light
+           transition-colors duration-200 cursor-pointer;
+  }
+  .btn-secondary {
+    @apply bg-transparent text-tierra-mid px-6 py-3 text-xs tracking-widest
+           uppercase rounded-wellness border border-sand
+           hover:border-sage hover:text-sage transition-colors duration-200 cursor-pointer;
+  }
+  .input-wellness {
+    @apply w-full px-4 py-3 bg-white border border-beige-lino rounded-wellness
+           text-tierra text-sm placeholder:text-tierra-light
+           focus:outline-none focus:border-sage transition-colors duration-200;
+  }
+  .label-wellness {
+    @apply text-xs tracking-widest uppercase text-tierra-light block mb-2;
+  }
+  .card-wellness {
+    @apply bg-white border border-beige-lino rounded-wellness p-6
+           hover:border-sage transition-colors duration-200;
+  }
+}
