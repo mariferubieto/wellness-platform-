@@ -2,7 +2,8 @@
   "name": "wellness-platform",
   "private": true,
   "workspaces": [
-    "frontend",
+    "frontend-shala",
+    "frontend-marifer",
     "backend"
   ],
   "scripts": {
