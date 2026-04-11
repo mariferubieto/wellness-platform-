@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { api } from '@/lib/api';
 
 interface Maestro { id: string; nombre: string; }
@@ -25,6 +25,7 @@ interface ClaseBorrador extends ClasePlantilla {
 type SemanaBase = Record<number, ClasePlantilla[]>;
 
 const DIAS_SEMANA = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 const HORAS = Array.from({ length: 24 }, (_, i) => {
   const h = i.toString().padStart(2, '0');
   return [`${h}:00`, `${h}:30`];
@@ -43,7 +44,9 @@ function getDiasDelMes(year: number, month: number): string[] {
   const dias: string[] = [];
   const d = new Date(year, month, 1);
   while (d.getMonth() === month) {
-    dias.push(d.toISOString().slice(0, 10));
+    dias.push(
+      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+    );
     d.setDate(d.getDate() + 1);
   }
   return dias;
@@ -88,6 +91,7 @@ export default function PlanificadorPage() {
   const [estilos, setEstilos] = useState<Estilo[]>([]);
   const [guardando, setGuardando] = useState(false);
   const [msg, setMsg] = useState('');
+  const msgTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     Promise.all([
@@ -96,7 +100,11 @@ export default function PlanificadorPage() {
     ]).then(([m, e]) => { setMaestros(m); setEstilos(e); }).catch(() => {});
   }, []);
 
-  function showMsg(m: string) { setMsg(m); setTimeout(() => setMsg(''), 4000); }
+  function showMsg(m: string) {
+    if (msgTimerRef.current) clearTimeout(msgTimerRef.current);
+    setMsg(m);
+    msgTimerRef.current = setTimeout(() => setMsg(''), 4000);
+  }
 
   function addPlantillaAlDia(dia: number) {
     setSemanaBase(prev => ({
@@ -133,6 +141,9 @@ export default function PlanificadorPage() {
         nuevas.push({ ...p, fecha, _key: uniqueKey() });
       }
     }
+    if (borradores.length > 0 && !window.confirm(`Esto reemplazará las ${borradores.length} clases en borrador. ¿Continuar?`)) {
+      return;
+    }
     setBorradores(nuevas);
     showMsg(`${nuevas.length} clases generadas — revisa y guarda`);
   }
@@ -143,11 +154,8 @@ export default function PlanificadorPage() {
       fecha,
       _key: uniqueKey(),
     };
-    setBorradores(prev => {
-      const updated = [...prev, nuevaBorrador];
-      setEditando({ borrador: nuevaBorrador, index: updated.length - 1 });
-      return updated;
-    });
+    setBorradores(prev => [...prev, nuevaBorrador]);
+    setEditando({ borrador: nuevaBorrador, index: 0 });
   }
 
   function copiarClase(b: ClaseBorrador) {
@@ -178,6 +186,19 @@ export default function PlanificadorPage() {
 
   async function guardarMes() {
     if (borradores.length === 0) { showMsg('No hay clases en el borrador'); return; }
+
+    const sinNombre = borradores.filter(b => !b.nombre.trim());
+    if (sinNombre.length > 0) {
+      showMsg(`${sinNombre.length} clase(s) sin nombre — completa el nombre antes de guardar`);
+      return;
+    }
+
+    const horasInvalidas = borradores.filter(b => b.hora_fin <= b.hora_inicio);
+    if (horasInvalidas.length > 0) {
+      showMsg(`${horasInvalidas.length} clase(s) con hora de fin anterior al inicio — revisa los horarios`);
+      return;
+    }
+
     setGuardando(true);
     try {
       const payload = borradores.map(b => ({
@@ -199,7 +220,6 @@ export default function PlanificadorPage() {
     }
   }
 
-  const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   const grid = getCalendarioGrid(year, month);
   const borradoresPorFecha: Record<string, ClaseBorrador[]> = {};
   for (const b of borradores) {
