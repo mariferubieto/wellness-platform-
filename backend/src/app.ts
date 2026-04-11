@@ -41,6 +41,7 @@ import newsletterRouter from './routes/newsletter/index';
 import pagosRouter from './routes/pagos/index';
 import behaviorRouter from './routes/behavior/index';
 import codigosRouter from './routes/codigos';
+import leadsRouter from './routes/leads';
 
 app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
@@ -54,6 +55,7 @@ app.use('/api/newsletter', newsletterRouter);
 app.use('/api/pagos', pagosRouter);
 app.use('/api/behavior', behaviorRouter);
 app.use('/api/codigos', codigosRouter);
+app.use('/api/leads', leadsRouter);
 
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error(err.stack);
