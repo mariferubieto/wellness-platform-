@@ -37,6 +37,7 @@ const sampleClase = {
   tipo: 'regular',
   precio_especial: null,
   activo: true,
+  espacio_tipo: 'salon',
   maestros: { id: 'maestro-1', users: { nombre: 'Ana' } },
 };
 

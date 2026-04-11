@@ -55,6 +55,7 @@ export async function createClase(input: CreateClaseInput) {
 }
 
 export async function createClasesBatch(inputs: CreateClaseInput[]) {
+  if (inputs.length === 0) throw new Error('Se requiere al menos una clase');
   const rows = inputs.map(input => ({
     maestro_id: input.maestro_id ?? null,
     nombre: input.nombre,
