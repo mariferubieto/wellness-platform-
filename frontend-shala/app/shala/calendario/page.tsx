@@ -19,7 +19,7 @@ interface Clase {
 }
 
 interface PaqueteUsuario { id: string; clases_restantes: number; expira_en: string; }
-interface Reserva { id: string; estado: string; clases: { id: string }; }
+interface Reserva { id: string; estado: string; clases?: { id: string } | null; }
 
 const DIAS_SEMANA_CORTO = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 
