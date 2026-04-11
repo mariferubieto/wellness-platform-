@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import Navbar from '@/components/ui/Navbar';
+import LeadPopup from '@/components/ui/LeadPopup';
 import { Playfair_Display, Josefin_Sans, Fredoka, EB_Garamond } from 'next/font/google';
 
 const playfair = Playfair_Display({
@@ -38,6 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen bg-beige antialiased">
         <Navbar />
         {children}
+        <LeadPopup />
       </body>
     </html>
   );
