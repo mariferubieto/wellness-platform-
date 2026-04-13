@@ -23,13 +23,13 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   const path = request.nextUrl.pathname;
 
-  const protectedPaths = ['/perfil', '/mis-paquetes', '/mis-reservas', '/admin'];
+  const protectedPaths = ['/perfil', '/shala/mis-paquetes', '/mis-reservas', '/admin'];
   if (protectedPaths.some(p => path.startsWith(p)) && !user) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
   if ((path === '/login' || path === '/registro') && user) {
-    return NextResponse.redirect(new URL('/calendario', request.url));
+    return NextResponse.redirect(new URL('/shala/calendario', request.url));
   }
 
   return response;

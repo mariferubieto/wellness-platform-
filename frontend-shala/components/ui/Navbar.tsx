@@ -33,7 +33,7 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 bg-beige border-b border-sand/40">
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-6">
         <Link
-          href="/calendario"
+          href="/shala/calendario"
           className="text-sm tracking-[0.2em] uppercase text-tierra font-medium shrink-0"
           style={{ fontFamily: 'var(--font-playfair)', fontWeight: 900, fontSize: '1.05rem', letterSpacing: '0.08em' }}
         >
