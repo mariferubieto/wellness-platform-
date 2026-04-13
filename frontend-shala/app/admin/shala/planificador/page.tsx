@@ -203,8 +203,8 @@ export default function PlanificadorPage() {
     try {
       const payload = borradores.map(b => ({
         nombre: b.nombre,
-        inicio: `${b.fecha}T${b.hora_inicio}:00`,
-        fin: `${b.fecha}T${b.hora_fin}:00`,
+        inicio: new Date(`${b.fecha}T${b.hora_inicio}:00`).toISOString(),
+        fin: new Date(`${b.fecha}T${b.hora_fin}:00`).toISOString(),
         capacidad: b.capacidad,
         espacio_tipo: b.espacio_tipo,
         maestro_id: b.maestro_id || undefined,
