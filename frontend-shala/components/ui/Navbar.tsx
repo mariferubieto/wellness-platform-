@@ -7,8 +7,9 @@ import { createSupabaseClient } from '@/lib/supabase';
 import { api } from '@/lib/api';
 
 const NAV_ITEMS = [
-  { label: 'Calendario', href: '/calendario' },
-  { label: 'Mis Paquetes', href: '/mis-paquetes' },
+  { label: 'Calendario', href: '/shala/calendario' },
+  { label: 'Mis Reservas', href: '/mis-reservas' },
+  { label: 'Mis Paquetes', href: '/shala/mis-paquetes' },
 ];
 
 const HIDDEN_PATHS = ['/login', '/registro'];
