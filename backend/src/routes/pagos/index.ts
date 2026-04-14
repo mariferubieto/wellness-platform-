@@ -44,7 +44,7 @@ router.post('/mercadopago/crear', requireAuth, async (req: AuthenticatedRequest,
       return;
     }
 
-    const validConceptos = ['paquete_shala', 'diplomado', 'retiro', 'evento'];
+    const validConceptos = ['paquete_shala', 'diplomado', 'retiro', 'evento', 'curso_ayurveda'];
     if (!validConceptos.includes(concepto)) {
       res.status(400).json({ error: `concepto debe ser uno de: ${validConceptos.join(', ')}` });
       return;

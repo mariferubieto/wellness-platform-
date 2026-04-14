@@ -6,12 +6,12 @@ import { supabaseAdmin } from '../../config/supabase';
 
 const router = Router();
 
-type TipoCurso = 'cocina' | 'mudras' | 'extras';
+type TipoCurso = 'cocina' | 'pranayamas' | 'extras';
 
 // Public: list by tipo
 router.get('/:tipo', async (req: Request, res: Response): Promise<void> => {
   const tipo = req.params.tipo as TipoCurso;
-  if (!['cocina', 'mudras', 'extras'].includes(tipo)) {
+  if (!['cocina', 'pranayamas', 'extras'].includes(tipo)) {
     res.status(400).json({ error: 'tipo inválido' });
     return;
   }
@@ -27,12 +27,12 @@ router.get('/:tipo', async (req: Request, res: Response): Promise<void> => {
 
 // Admin: create
 router.post('/', requireAuth, requireRole('admin'), async (req: AuthenticatedRequest, res: Response): Promise<void> => {
-  const { tipo, nombre, descripcion, temario, fechas, precio, foto_url, cupo_maximo } = req.body;
+  const { tipo, nombre, descripcion, temario, fechas, precio, foto_url, cupo_maximo, tipo_acceso } = req.body;
   if (!tipo || !nombre) {
     res.status(400).json({ error: 'tipo y nombre son requeridos' });
     return;
   }
-  if (!['cocina', 'mudras', 'extras'].includes(tipo)) {
+  if (!['cocina', 'pranayamas', 'extras'].includes(tipo)) {
     res.status(400).json({ error: 'tipo inválido' });
     return;
   }
@@ -47,6 +47,7 @@ router.post('/', requireAuth, requireRole('admin'), async (req: AuthenticatedReq
       precio: precio ? Number(precio) : 0,
       foto_url: foto_url ?? null,
       cupo_maximo: cupo_maximo ? Number(cupo_maximo) : null,
+      tipo_acceso: tipo_acceso ?? 'pago',
     })
     .select()
     .single();
@@ -56,7 +57,7 @@ router.post('/', requireAuth, requireRole('admin'), async (req: AuthenticatedReq
 
 // Admin: update
 router.patch('/:id', requireAuth, requireRole('admin'), async (req: AuthenticatedRequest, res: Response): Promise<void> => {
-  const { nombre, descripcion, temario, fechas, precio, foto_url, cupo_maximo, activo } = req.body;
+  const { nombre, descripcion, temario, fechas, precio, foto_url, cupo_maximo, activo, tipo_acceso } = req.body;
   const updates: Record<string, unknown> = {};
   if (nombre !== undefined) updates.nombre = nombre;
   if (descripcion !== undefined) updates.descripcion = descripcion;
@@ -66,6 +67,7 @@ router.patch('/:id', requireAuth, requireRole('admin'), async (req: Authenticate
   if (foto_url !== undefined) updates.foto_url = foto_url;
   if (cupo_maximo !== undefined) updates.cupo_maximo = cupo_maximo ? Number(cupo_maximo) : null;
   if (activo !== undefined) updates.activo = activo;
+  if (tipo_acceso !== undefined) updates.tipo_acceso = tipo_acceso;
 
   const { data, error } = await supabaseAdmin
     .from('cursos_ayurveda')
