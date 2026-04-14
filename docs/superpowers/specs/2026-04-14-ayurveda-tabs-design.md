@@ -271,6 +271,9 @@ Panel blanco centrado (max-w-lg, overflow-y-auto, max-h-[90vh])
 ```
 
 **Curso con `tipo_acceso: 'pago'`:**
+
+Flujo de inscripción con coordinación de pago por WhatsApp.
+
 ```tsx
 <Link href={`/ayurveda/inscripcion?curso_id=${data.id}&nombre=${encodeURIComponent(data.nombre)}`}
   className="btn-primary w-full text-center">
@@ -292,12 +295,12 @@ Panel blanco centrado (max-w-lg, overflow-y-auto, max-h-[90vh])
 
 **Curso con `tipo_acceso: 'gratis'`:**
 
-Modo de recopilación de datos — el admin lo activa temporalmente cuando quiere capturar interesados sin barrera de pago. El curso sigue teniendo precio internamente; solo cambia el CTA y el formulario no menciona pago.
+Modo de recopilación de datos — el admin lo activa temporalmente. El botón dice "Inscribirme" igual que en modo pago, pero el formulario no menciona pago ni coordinación de transferencia.
 
 ```tsx
 <Link href={`/ayurveda/inscripcion?curso_id=${data.id}&nombre=${encodeURIComponent(data.nombre)}&modo=leads`}
   className="btn-primary w-full text-center">
-  Apuntarme
+  Inscribirme
 </Link>
 ```
 
@@ -317,7 +320,8 @@ Actualmente solo acepta `?diplomado_id=`. Actualizar para también aceptar `?cur
   - `handleSubmit` llama `POST /api/ayurveda/cursos-inscripciones` con `{ curso_id, nombre_completo, whatsapp, email: form.email_gmail, razon }`
   - Mensaje de éxito igual al de diplomados
   - Botón "Regresar" → `/ayurveda`
-  - Si `modo=leads`: el texto del botón de submit es "Apuntarme" en vez de "Enviar inscripción", y el pie de página dice "Nos pondremos en contacto por WhatsApp para confirmar tu lugar." — sin mención de pago.
+  - Si `modo=leads` (`tipo_acceso: 'gratis'`): botón de submit dice "Inscribirme" igual, pie de página dice "Nos pondremos en contacto por WhatsApp." — sin mención de pago ni transferencia.
+  - Si `modo` no está presente (`tipo_acceso: 'pago'`): pie dice "Al enviar confirmas tu intención. El pago se coordina por WhatsApp."
 
 ---
 
