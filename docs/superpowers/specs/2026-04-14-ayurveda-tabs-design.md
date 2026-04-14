@@ -211,7 +211,7 @@ export default function CursoCard({ curso, onClick }: { curso: Curso; onClick: (
         <div className="flex items-start justify-between gap-2 mb-2">
           <h3 className="text-xl text-tierra">{curso.nombre}</h3>
           {curso.tipo_acceso === 'gratis' && (
-            <span className="text-xs px-2 py-0.5 bg-sage-muted text-sage rounded-full whitespace-nowrap">Gratuito</span>
+            <span className="text-xs px-2 py-0.5 bg-sage-muted text-sage rounded-full whitespace-nowrap">Registro abierto</span>
           )}
         </div>
         {curso.descripcion && (
@@ -222,15 +222,14 @@ export default function CursoCard({ curso, onClick }: { curso: Curso; onClick: (
         )}
       </div>
       <div className="mt-6 pt-6 border-t border-beige-lino flex items-center justify-between">
-        {curso.tipo_acceso === 'gratis' ? (
-          <p className="text-lg text-sage">Gratuito</p>
-        ) : curso.precio > 0 ? (
+        {curso.precio > 0 ? (
           <p className="text-2xl font-light text-tierra">
             ${curso.precio.toLocaleString('es-MX')} <span className="text-sm text-tierra-light">MXN</span>
           </p>
         ) : (
           <p className="text-tierra-light text-sm">Consultar precio</p>
         )}
+        {/* El precio siempre se muestra — tipo_acceso:'gratis' es modo de captura temporal, no indica precio $0 */}
         <span className="btn-secondary text-xs pointer-events-none">Ver más</span>
       </div>
     </div>
@@ -292,10 +291,13 @@ Panel blanco centrado (max-w-lg, overflow-y-auto, max-h-[90vh])
 ```
 
 **Curso con `tipo_acceso: 'gratis'`:**
+
+Modo de recopilación de datos — el admin lo activa temporalmente cuando quiere capturar interesados sin barrera de pago. El curso sigue teniendo precio internamente; solo cambia el CTA y el formulario no menciona pago.
+
 ```tsx
-<Link href={`/ayurveda/inscripcion?curso_id=${data.id}&nombre=${encodeURIComponent(data.nombre)}&gratis=true`}
+<Link href={`/ayurveda/inscripcion?curso_id=${data.id}&nombre=${encodeURIComponent(data.nombre)}&modo=leads`}
   className="btn-primary w-full text-center">
-  Apuntarme (Gratuito)
+  Apuntarme
 </Link>
 ```
 
@@ -315,7 +317,7 @@ Actualmente solo acepta `?diplomado_id=`. Actualizar para también aceptar `?cur
   - `handleSubmit` llama `POST /api/ayurveda/cursos-inscripciones` con `{ curso_id, nombre_completo, whatsapp, email: form.email_gmail, razon }`
   - Mensaje de éxito igual al de diplomados
   - Botón "Regresar" → `/ayurveda`
-  - Si `gratis=true`: el texto del botón de submit es "Apuntarme" en vez de "Enviar inscripción", y el pie dice "Sin costo. Te confirmamos tu lugar por WhatsApp."
+  - Si `modo=leads`: el texto del botón de submit es "Apuntarme" en vez de "Enviar inscripción", y el pie de página dice "Nos pondremos en contacto por WhatsApp para confirmar tu lugar." — sin mención de pago.
 
 ---
 
