@@ -36,6 +36,10 @@ router.post('/', requireAuth, requireRole('admin'), async (req: AuthenticatedReq
     res.status(400).json({ error: 'tipo inválido' });
     return;
   }
+  if (tipo_acceso && !['pago', 'whatsapp', 'gratis'].includes(tipo_acceso)) {
+    res.status(400).json({ error: 'tipo_acceso debe ser pago, whatsapp o gratis' });
+    return;
+  }
   const { data, error } = await supabaseAdmin
     .from('cursos_ayurveda')
     .insert({
@@ -67,7 +71,13 @@ router.patch('/:id', requireAuth, requireRole('admin'), async (req: Authenticate
   if (foto_url !== undefined) updates.foto_url = foto_url;
   if (cupo_maximo !== undefined) updates.cupo_maximo = cupo_maximo ? Number(cupo_maximo) : null;
   if (activo !== undefined) updates.activo = activo;
-  if (tipo_acceso !== undefined) updates.tipo_acceso = tipo_acceso;
+  if (tipo_acceso !== undefined) {
+    if (!['pago', 'whatsapp', 'gratis'].includes(tipo_acceso)) {
+      res.status(400).json({ error: 'tipo_acceso debe ser pago, whatsapp o gratis' });
+      return;
+    }
+    updates.tipo_acceso = tipo_acceso;
+  }
 
   const { data, error } = await supabaseAdmin
     .from('cursos_ayurveda')

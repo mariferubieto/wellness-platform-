@@ -11,18 +11,23 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
     return;
   }
 
-  const { data, error } = await supabaseAdmin
-    .from('inscripciones_cursos')
-    .insert({ curso_id, nombre_completo, whatsapp, email })
-    .select()
-    .single();
+  try {
+    const { data, error } = await supabaseAdmin
+      .from('inscripciones_cursos')
+      .insert({ curso_id, nombre_completo, whatsapp, email })
+      .select()
+      .single();
 
-  if (error) {
-    res.status(400).json({ error: error.message });
-    return;
+    if (error) {
+      res.status(400).json({ error: error.message });
+      return;
+    }
+
+    res.status(201).json(data);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Error interno';
+    res.status(500).json({ error: message });
   }
-
-  res.status(201).json(data);
 });
 
 export default router;
