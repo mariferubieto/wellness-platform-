@@ -39,7 +39,6 @@ CREATE TABLE IF NOT EXISTS inscripciones_cursos (
   nombre_completo text NOT NULL,
   whatsapp text NOT NULL,
   email text NOT NULL,
-  razon text,
   created_at timestamptz DEFAULT now()
 );
 ```
@@ -59,10 +58,10 @@ CREATE TABLE IF NOT EXISTS inscripciones_cursos (
 ```
 POST /api/ayurveda/cursos-inscripciones
 Auth: pública (sin requireAuth)
-Body: { curso_id, nombre_completo, whatsapp, email, razon? }
-Validación: curso_id, nombre_completo, whatsapp, email son requeridos
+Body: { curso_id, nombre_completo, whatsapp, email }
+Validación: todos los campos requeridos
 Acción: INSERT en inscripciones_cursos
-Response: 201 { id, curso_id, nombre_completo, ... }
+Response: 201 { id, curso_id, nombre_completo, whatsapp, email, created_at }
 ```
 
 ### `backend/src/routes/ayurveda/index.ts` — Modificar
@@ -272,11 +271,13 @@ Panel blanco centrado (max-w-lg, overflow-y-auto, max-h-[90vh])
 
 **Curso con `tipo_acceso: 'pago'`:**
 
-Flujo de inscripción con coordinación de pago por WhatsApp.
+Flujo con pago directo vía MercadoPago (igual que retiros).
 
 ```tsx
-<Link href={`/ayurveda/inscripcion?curso_id=${data.id}&nombre=${encodeURIComponent(data.nombre)}`}
-  className="btn-primary w-full text-center">
+<Link
+  href={`/ayurveda/inscripcion?curso_id=${data.id}&nombre=${encodeURIComponent(data.nombre)}&precio=${data.precio}`}
+  className="btn-primary w-full text-center"
+>
   Inscribirme
 </Link>
 ```
@@ -313,15 +314,17 @@ Modo de recopilación de datos — el admin lo activa temporalmente. El botón d
 Actualmente solo acepta `?diplomado_id=`. Actualizar para también aceptar `?curso_id=`.
 
 **Cambios:**
-- Leer `curso_id = searchParams.get('curso_id')` y `gratis = searchParams.get('gratis') === 'true'`
+- Leer `curso_id`, `nombre`, `precio`, `modo` de `searchParams`
 - Si `diplomado_id`: flujo existente sin cambios
 - Si `curso_id`:
-  - Cargar curso: `GET /api/ayurveda/cursos/` — nota: no hay GET por id, usar el nombre del query param para mostrar el título
-  - `handleSubmit` llama `POST /api/ayurveda/cursos-inscripciones` con `{ curso_id, nombre_completo, whatsapp, email: form.email_gmail, razon }`
-  - Mensaje de éxito igual al de diplomados
+  - Mostrar nombre del curso desde el query param (sin fetch adicional)
+  - Formulario: **solo** `nombre_completo`, `whatsapp`, `email_gmail` — sin campo `razon`
+  - Si **`modo` no presente** (`tipo_acceso: 'pago'`):
+    - `handleSubmit`: `POST /api/ayurveda/cursos-inscripciones` con `{ curso_id, nombre_completo, whatsapp, email }`, luego llamar `iniciarPago({ concepto: 'curso_ayurveda', concepto_id: curso_id, monto: precio, titulo: nombre })` para redirigir a MercadoPago
+  - Si **`modo=leads`** (`tipo_acceso: 'gratis'`):
+    - `handleSubmit`: solo `POST /api/ayurveda/cursos-inscripciones` (sin pago), redirigir a pantalla de éxito
+    - Pie: "Nos pondremos en contacto por WhatsApp para confirmar tu lugar."
   - Botón "Regresar" → `/ayurveda`
-  - Si `modo=leads` (`tipo_acceso: 'gratis'`): botón de submit dice "Inscribirme" igual, pie de página dice "Nos pondremos en contacto por WhatsApp." — sin mención de pago ni transferencia.
-  - Si `modo` no está presente (`tipo_acceso: 'pago'`): pie dice "Al enviar confirmas tu intención. El pago se coordina por WhatsApp."
 
 ---
 
