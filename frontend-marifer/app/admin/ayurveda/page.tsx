@@ -18,7 +18,7 @@ interface Diplomado {
 
 interface CursoAyurveda {
   id: string;
-  tipo: 'cocina' | 'mudras' | 'extras';
+  tipo: 'cocina' | 'pranayamas' | 'extras';
   nombre: string;
   descripcion?: string;
   temario?: string[];
@@ -27,6 +27,7 @@ interface CursoAyurveda {
   foto_url?: string;
   cupo_maximo?: number;
   activo: boolean;
+  tipo_acceso: 'pago' | 'whatsapp' | 'gratis';
 }
 
 interface Inscripcion {
@@ -39,12 +40,12 @@ interface Inscripcion {
   diplomados: { nombre: string; generacion: string } | null;
 }
 
-type TabId = 'diplomados' | 'cocina' | 'mudras' | 'extras' | 'inscripciones';
+type TabId = 'diplomados' | 'cocina' | 'pranayamas' | 'extras' | 'inscripciones';
 
 const TABS: { id: TabId; label: string }[] = [
   { id: 'diplomados', label: 'Diplomados' },
   { id: 'cocina', label: 'Clases de Cocina' },
-  { id: 'mudras', label: 'Mudras y Bandhas' },
+  { id: 'pranayamas', label: 'Pranayamas' },
   { id: 'extras', label: 'Cursos Extras' },
   { id: 'inscripciones', label: 'Inscripciones' },
 ];
@@ -186,8 +187,8 @@ function DiplomadosTab() {
   );
 }
 
-/* ─── Curso Tab (cocina / mudras / extras) ───────────── */
-interface CursoTabProps { tipo: 'cocina' | 'mudras' | 'extras'; label: string; }
+/* ─── Curso Tab (cocina / pranayamas / extras) ───────────── */
+interface CursoTabProps { tipo: 'cocina' | 'pranayamas' | 'extras'; label: string; }
 
 function CursoTab({ tipo, label }: CursoTabProps) {
   const [cursos, setCursos] = useState<CursoAyurveda[]>([]);
@@ -196,6 +197,7 @@ function CursoTab({ tipo, label }: CursoTabProps) {
   const [error, setError] = useState('');
   const [form, setForm] = useState({
     nombre: '', descripcion: '', temario: '', fechas: '', precio: '', foto_url: '', cupo_maximo: '',
+    tipo_acceso: 'pago' as 'pago' | 'whatsapp' | 'gratis',
   });
 
   const load = useCallback(async () => {
@@ -222,8 +224,9 @@ function CursoTab({ tipo, label }: CursoTabProps) {
         precio: Number(form.precio) || 0,
         foto_url: form.foto_url || undefined,
         cupo_maximo: form.cupo_maximo ? Number(form.cupo_maximo) : undefined,
+        tipo_acceso: form.tipo_acceso,
       });
-      setForm({ nombre: '', descripcion: '', temario: '', fechas: '', precio: '', foto_url: '', cupo_maximo: '' });
+      setForm({ nombre: '', descripcion: '', temario: '', fechas: '', precio: '', foto_url: '', cupo_maximo: '', tipo_acceso: 'pago' });
       await load();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Error');
@@ -285,6 +288,18 @@ function CursoTab({ tipo, label }: CursoTabProps) {
                 placeholder="Lunes 5 de mayo, 6pm–8pm&#10;Lunes 12 de mayo, 6pm–8pm&#10;..."
                 onChange={e => setForm(f => ({ ...f, fechas: e.target.value }))} />
             </div>
+          </div>
+          <div>
+            <label className="label-wellness">Tipo de acceso</label>
+            <select
+              value={form.tipo_acceso}
+              onChange={e => setForm(f => ({ ...f, tipo_acceso: e.target.value as 'pago' | 'whatsapp' | 'gratis' }))}
+              className="input-wellness mt-1"
+            >
+              <option value="pago">Pago (MercadoPago)</option>
+              <option value="whatsapp">WhatsApp (contacto directo)</option>
+              <option value="gratis">Recopilación de datos</option>
+            </select>
           </div>
           {error && <p className="text-red-400 text-xs">{error}</p>}
           <div className="flex justify-end">
@@ -480,7 +495,7 @@ export default function AdminAyurvedaPage() {
       {/* Tab content */}
       {activeTab === 'diplomados' && <DiplomadosTab />}
       {activeTab === 'cocina' && <CursoTab tipo="cocina" label="Clases de Cocina" />}
-      {activeTab === 'mudras' && <CursoTab tipo="mudras" label="Mudras y Bandhas" />}
+      {activeTab === 'pranayamas' && <CursoTab tipo="pranayamas" label="Pranayamas" />}
       {activeTab === 'extras' && <CursoTab tipo="extras" label="Cursos Extras" />}
       {activeTab === 'inscripciones' && <InscripcionesTab />}
     </div>
