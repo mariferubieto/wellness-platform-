@@ -1,3 +1,5 @@
+import Image from 'next/image';
+
 interface Curso {
   id: string;
   nombre: string;
@@ -13,13 +15,19 @@ export default function CursoCard({ curso, onClick }: { curso: Curso; onClick: (
     <div
       className="card-wellness flex flex-col cursor-pointer hover:shadow-md transition-shadow"
       onClick={onClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') onClick(); }}
     >
       {curso.foto_url && (
-        <img
-          src={curso.foto_url}
-          alt={curso.nombre}
-          className="w-full h-40 object-cover rounded-t-wellness mb-4"
-        />
+        <div className="relative w-full h-40 mb-4">
+          <Image
+            src={curso.foto_url}
+            alt={curso.nombre}
+            fill
+            className="object-cover rounded-t-wellness"
+          />
+        </div>
       )}
       <div className="flex-1">
         <div className="flex items-start justify-between gap-2 mb-2">

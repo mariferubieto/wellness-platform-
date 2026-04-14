@@ -37,6 +37,9 @@ export default function DiplomadoCard({ diplomado, onClick }: Props) {
       <div
         className="card-wellness flex flex-col cursor-pointer hover:shadow-md transition-shadow"
         onClick={onClick}
+        role="button"
+        tabIndex={0}
+        onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') onClick(); }}
       >
         {inner}
       </div>
