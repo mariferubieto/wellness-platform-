@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface Retiro {
   id: string;
@@ -8,6 +9,7 @@ interface Retiro {
   precio: number;
   fecha_inicio?: string;
   fecha_fin?: string;
+  imagen_url?: string;
 }
 
 export default function RetiroCard({ retiro }: { retiro: Retiro }) {
@@ -17,6 +19,16 @@ export default function RetiroCard({ retiro }: { retiro: Retiro }) {
 
   return (
     <div className="card-wellness flex flex-col">
+      {retiro.imagen_url && (
+        <div className="relative w-full h-40 mb-4">
+          <Image
+            src={retiro.imagen_url}
+            alt={retiro.nombre}
+            fill
+            className="object-cover rounded-wellness"
+          />
+        </div>
+      )}
       <div className="flex-1">
         {fechas && <p className="label-wellness mb-3">{fechas}</p>}
         <h3 className="text-xl text-tierra mb-2">{retiro.nombre}</h3>

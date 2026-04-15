@@ -12,6 +12,7 @@ interface Retiro {
   precio: number;
   fecha_inicio?: string;
   fecha_fin?: string;
+  imagen_url?: string;
 }
 
 export default function RetirosPage() {
