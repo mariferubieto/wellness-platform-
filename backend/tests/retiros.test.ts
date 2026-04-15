@@ -203,3 +203,15 @@ describe('POST /api/retiros/inscripciones', () => {
     expect(res.status).toBe(404);
   });
 });
+
+describe('PATCH /api/retiros/:id (admin) — tipo_acceso validation', () => {
+  it('returns 400 for invalid tipo_acceso', async () => {
+    mockAdminAuth();
+    const res = await request(app)
+      .patch('/api/retiros/ret-1')
+      .set('Authorization', 'Bearer valid-token')
+      .send({ tipo_acceso: 'gratis' });
+    expect(res.status).toBe(400);
+    expect(res.body.error).toMatch(/tipo_acceso/);
+  });
+});

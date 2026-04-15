@@ -3,7 +3,7 @@ import { supabaseAdmin } from '../config/supabase';
 export async function getRetiros() {
   const { data, error } = await supabaseAdmin
     .from('retiros')
-    .select('id, nombre, descripcion, lugar, precio, fecha_inicio, fecha_fin, imagen_url, whatsapp_contacto, activo')
+    .select('id, nombre, descripcion, lugar, precio, fecha_inicio, fecha_fin, imagen_url, activo, tipo_acceso')
     .eq('activo', true)
     .order('fecha_inicio', { ascending: true });
 
@@ -14,7 +14,7 @@ export async function getRetiros() {
 export async function getRetiroById(id: string) {
   const { data, error } = await supabaseAdmin
     .from('retiros')
-    .select('id, nombre, descripcion, lugar, incluye, precio, fecha_inicio, fecha_fin, imagen_url, whatsapp_contacto, activo')
+    .select('id, nombre, descripcion, lugar, incluye, precio, fecha_inicio, fecha_fin, imagen_url, whatsapp_contacto, activo, tipo_acceso')
     .eq('id', id)
     .single();
 
@@ -32,6 +32,7 @@ export async function createRetiro(body: {
   fecha_fin?: string;
   imagen_url?: string;
   whatsapp_contacto?: string;
+  tipo_acceso?: 'pago' | 'whatsapp';
 }) {
   const { data, error } = await supabaseAdmin
     .from('retiros')
@@ -45,6 +46,7 @@ export async function createRetiro(body: {
       fecha_fin: body.fecha_fin ?? null,
       imagen_url: body.imagen_url ?? null,
       whatsapp_contacto: body.whatsapp_contacto ?? null,
+      tipo_acceso: body.tipo_acceso ?? 'pago',
     })
     .select()
     .single();
@@ -64,6 +66,7 @@ export async function updateRetiro(id: string, body: Partial<{
   imagen_url: string;
   whatsapp_contacto: string;
   activo: boolean;
+  tipo_acceso: 'pago' | 'whatsapp';
 }>) {
   const { data, error } = await supabaseAdmin
     .from('retiros')

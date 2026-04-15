@@ -66,6 +66,11 @@ router.post('/', requireAuth, requireRole('admin'), async (req: AuthenticatedReq
       res.status(400).json({ error: 'nombre y precio son requeridos' });
       return;
     }
+    const { tipo_acceso } = req.body;
+    if (tipo_acceso !== undefined && !['pago', 'whatsapp'].includes(tipo_acceso)) {
+      res.status(400).json({ error: 'tipo_acceso debe ser pago o whatsapp' });
+      return;
+    }
     const retiro = await createRetiro({ ...req.body, precio: Number(req.body.precio) });
     res.status(201).json(retiro);
   } catch (err: unknown) {
@@ -76,6 +81,11 @@ router.post('/', requireAuth, requireRole('admin'), async (req: AuthenticatedReq
 // Admin: update
 router.patch('/:id', requireAuth, requireRole('admin'), async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
+    const { tipo_acceso } = req.body;
+    if (tipo_acceso !== undefined && !['pago', 'whatsapp'].includes(tipo_acceso)) {
+      res.status(400).json({ error: 'tipo_acceso debe ser pago o whatsapp' });
+      return;
+    }
     const retiro = await updateRetiro(req.params.id, req.body);
     res.json(retiro);
   } catch (err: unknown) {
