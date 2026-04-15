@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { iniciarPago } from '@/lib/pagos';
@@ -38,8 +38,13 @@ function InscripcionForm() {
   });
 
   // Redirect to /ayurveda if no item specified
+  useEffect(() => {
+    if (!diplomadoId && !cursoId) {
+      router.push('/ayurveda');
+    }
+  }, [diplomadoId, cursoId, router]);
+
   if (!diplomadoId && !cursoId) {
-    router.push('/ayurveda');
     return null;
   }
 
