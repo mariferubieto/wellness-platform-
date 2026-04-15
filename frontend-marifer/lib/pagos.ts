@@ -2,7 +2,7 @@
 import { api } from './api';
 
 interface IniciarPagoParams {
-  concepto: 'paquete_shala' | 'diplomado' | 'retiro' | 'evento';
+  concepto: 'paquete_shala' | 'diplomado' | 'retiro' | 'evento' | 'curso_ayurveda';
   concepto_id: string;
   monto: number;
   titulo: string;

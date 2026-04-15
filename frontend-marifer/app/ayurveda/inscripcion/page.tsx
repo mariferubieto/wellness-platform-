@@ -1,30 +1,28 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
+import { iniciarPago } from '@/lib/pagos';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
-
-interface Diplomado {
-  id: string;
-  nombre: string;
-  precio: number;
-  generacion: string;
-}
 
 function InscripcionForm() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const diplomadoId = searchParams.get('diplomado_id') ?? '';
 
-  const [diplomado, setDiplomado] = useState<Diplomado | null>(null);
-  const [cargando, setCargando] = useState(true);
+  const diplomadoId = searchParams.get('diplomado_id') ?? '';
+  const cursoId = searchParams.get('curso_id') ?? '';
+  const cursoNombre = searchParams.get('nombre') ?? 'Curso';
+  const cursoPrecio = parseFloat(searchParams.get('precio') ?? '0');
+  const modo = searchParams.get('modo') ?? '';
+
   const [enviando, setEnviando] = useState(false);
   const [exito, setExito] = useState(false);
   const [error, setError] = useState('');
 
-  const [form, setForm] = useState({
+  // Diplomado flow — keeps existing fields
+  const [formDiplomado, setFormDiplomado] = useState({
     nombre_completo: '',
     fecha_nacimiento: '',
     whatsapp: '',
@@ -32,30 +30,27 @@ function InscripcionForm() {
     razon: '',
   });
 
-  useEffect(() => {
-    if (!diplomadoId) {
-      router.push('/ayurveda');
-      return;
-    }
-    api.get<Diplomado>(`/api/ayurveda/diplomados/${diplomadoId}`)
-      .then(setDiplomado)
-      .catch(() => router.push('/ayurveda'))
-      .finally(() => setCargando(false));
-  }, [diplomadoId, router]);
+  // Curso flow — simplified fields
+  const [formCurso, setFormCurso] = useState({
+    nombre_completo: '',
+    whatsapp: '',
+    email_gmail: '',
+  });
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
-    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  // Redirect to /ayurveda if no item specified
+  if (!diplomadoId && !cursoId) {
+    router.push('/ayurveda');
+    return null;
   }
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmitDiplomado(e: React.FormEvent) {
     e.preventDefault();
     setError('');
     setEnviando(true);
-
     try {
       await api.post('/api/ayurveda/inscripciones', {
         diplomado_id: diplomadoId,
-        ...form,
+        ...formDiplomado,
       });
       setExito(true);
     } catch (err: unknown) {
@@ -65,12 +60,31 @@ function InscripcionForm() {
     }
   }
 
-  if (cargando) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-tierra-light text-sm tracking-widest uppercase">Cargando...</p>
-      </div>
-    );
+  async function handleSubmitCurso(e: React.FormEvent) {
+    e.preventDefault();
+    setError('');
+    setEnviando(true);
+    try {
+      await api.post('/api/ayurveda/cursos-inscripciones', {
+        curso_id: cursoId,
+        nombre_completo: formCurso.nombre_completo,
+        whatsapp: formCurso.whatsapp,
+        email: formCurso.email_gmail,
+      });
+      if (modo === 'leads') {
+        setExito(true);
+      } else {
+        await iniciarPago({
+          concepto: 'curso_ayurveda',
+          concepto_id: cursoId,
+          monto: cursoPrecio,
+          titulo: cursoNombre,
+        });
+      }
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Error al procesar la inscripción');
+      setEnviando(false);
+    }
   }
 
   if (exito) {
@@ -80,88 +94,101 @@ function InscripcionForm() {
           <div className="w-12 h-px bg-sand mx-auto mb-8" />
           <h1 className="text-3xl text-tierra mb-4">Inscripción recibida</h1>
           <p className="text-tierra-light text-sm leading-relaxed mb-8">
-            Gracias por inscribirte. Recibirás confirmación por WhatsApp en las próximas horas.
+            Gracias por inscribirte. Nos pondremos en contacto por WhatsApp para confirmar tu lugar.
           </p>
           <button onClick={() => router.push('/ayurveda')} className="btn-secondary">
-            Volver a diplomados
+            Volver a Ayurveda
           </button>
         </div>
       </div>
     );
   }
 
+  // ── Diplomado form (existing logic) ──
+  if (diplomadoId) {
+    return (
+      <div className="min-h-screen px-4 py-16">
+        <div className="max-w-lg mx-auto">
+          <button
+            onClick={() => router.push('/ayurveda')}
+            className="text-tierra-light text-xs tracking-widest uppercase mb-10 hover:text-tierra transition-colors"
+          >
+            ← Regresar
+          </button>
+          <div className="w-8 h-px bg-sand mb-6" />
+          <h1 className="text-3xl text-tierra mb-2">Formulario de inscripción</h1>
+          <p className="text-tierra-light text-sm mb-10">Diplomado Manali Ayurveda</p>
+          <form onSubmit={handleSubmitDiplomado} className="space-y-5">
+            <Input label="Nombre completo" name="nombre_completo"
+              value={formDiplomado.nombre_completo}
+              onChange={e => setFormDiplomado(f => ({ ...f, nombre_completo: e.target.value }))} required />
+            <Input label="Fecha de nacimiento" name="fecha_nacimiento" type="date"
+              value={formDiplomado.fecha_nacimiento}
+              onChange={e => setFormDiplomado(f => ({ ...f, fecha_nacimiento: e.target.value }))} />
+            <Input label="WhatsApp" name="whatsapp" type="tel"
+              value={formDiplomado.whatsapp}
+              onChange={e => setFormDiplomado(f => ({ ...f, whatsapp: e.target.value }))}
+              placeholder="10 dígitos" required />
+            <Input label="Email Gmail" name="email_gmail" type="email"
+              value={formDiplomado.email_gmail}
+              onChange={e => setFormDiplomado(f => ({ ...f, email_gmail: e.target.value }))}
+              placeholder="nombre@gmail.com" required />
+            <div>
+              <label className="label-wellness block mb-2">¿Por qué quieres estudiar Ayurveda?</label>
+              <textarea
+                name="razon"
+                value={formDiplomado.razon}
+                onChange={e => setFormDiplomado(f => ({ ...f, razon: e.target.value }))}
+                rows={4}
+                className="w-full px-4 py-3 bg-white border border-beige-lino rounded-wellness text-sm text-tierra placeholder:text-tierra-light/50 focus:outline-none focus:border-sage transition-colors resize-none"
+                placeholder="Compártenos tu motivación..."
+              />
+            </div>
+            {error && <p className="text-red-400 text-xs">{error}</p>}
+            <Button type="submit" loading={enviando} className="w-full">
+              Enviar inscripción
+            </Button>
+            <p className="text-tierra-light text-xs text-center">
+              Al enviar confirmas tu intención de inscripción. El pago y confirmación se coordinan por WhatsApp.
+            </p>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Curso form ──
   return (
     <div className="min-h-screen px-4 py-16">
       <div className="max-w-lg mx-auto">
         <button
-          onClick={() => router.push(`/ayurveda/${diplomadoId}`)}
+          onClick={() => router.push('/ayurveda')}
           className="text-tierra-light text-xs tracking-widest uppercase mb-10 hover:text-tierra transition-colors"
         >
           ← Regresar
         </button>
-
         <div className="w-8 h-px bg-sand mb-6" />
-        <h1 className="text-3xl text-tierra mb-2">Formulario de inscripción</h1>
-        {diplomado && (
-          <p className="text-tierra-light text-sm mb-10">
-            {diplomado.nombre} · {diplomado.generacion}
-          </p>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <Input
-            label="Nombre completo"
-            name="nombre_completo"
-            value={form.nombre_completo}
-            onChange={handleChange}
-            required
-          />
-          <Input
-            label="Fecha de nacimiento"
-            name="fecha_nacimiento"
-            type="date"
-            value={form.fecha_nacimiento}
-            onChange={handleChange}
-          />
-          <Input
-            label="WhatsApp"
-            name="whatsapp"
-            type="tel"
-            value={form.whatsapp}
-            onChange={handleChange}
-            placeholder="10 dígitos"
-            required
-          />
-          <Input
-            label="Email Gmail"
-            name="email_gmail"
-            type="email"
-            value={form.email_gmail}
-            onChange={handleChange}
-            placeholder="nombre@gmail.com"
-            required
-          />
-
-          <div>
-            <label className="label-wellness block mb-2">¿Por qué quieres estudiar Ayurveda?</label>
-            <textarea
-              name="razon"
-              value={form.razon}
-              onChange={handleChange}
-              rows={4}
-              className="w-full px-4 py-3 bg-white border border-beige-lino rounded-wellness text-sm text-tierra placeholder:text-tierra-light/50 focus:outline-none focus:border-sage transition-colors resize-none"
-              placeholder="Compártenos tu motivación..."
-            />
-          </div>
-
+        <h1 className="text-3xl text-tierra mb-2">Inscripción</h1>
+        <p className="text-tierra-light text-sm mb-10">{cursoNombre}</p>
+        <form onSubmit={handleSubmitCurso} className="space-y-5">
+          <Input label="Nombre completo" name="nombre_completo"
+            value={formCurso.nombre_completo}
+            onChange={e => setFormCurso(f => ({ ...f, nombre_completo: e.target.value }))} required />
+          <Input label="WhatsApp" name="whatsapp" type="tel"
+            value={formCurso.whatsapp}
+            onChange={e => setFormCurso(f => ({ ...f, whatsapp: e.target.value }))}
+            placeholder="10 dígitos" required />
+          <Input label="Email" name="email_gmail" type="email"
+            value={formCurso.email_gmail}
+            onChange={e => setFormCurso(f => ({ ...f, email_gmail: e.target.value }))} required />
           {error && <p className="text-red-400 text-xs">{error}</p>}
-
           <Button type="submit" loading={enviando} className="w-full">
-            Enviar inscripción
+            Inscribirme
           </Button>
-
           <p className="text-tierra-light text-xs text-center">
-            Al enviar confirmas tu intención de inscripción. El pago y confirmación se coordinan por WhatsApp.
+            {modo === 'leads'
+              ? 'Nos pondremos en contacto por WhatsApp para confirmar tu lugar.'
+              : 'Al continuar serás redirigido a MercadoPago para completar el pago.'}
           </p>
         </form>
       </div>
