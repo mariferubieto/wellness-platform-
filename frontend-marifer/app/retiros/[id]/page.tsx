@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
+import Image from 'next/image';
 
 interface Retiro {
   id: string;
@@ -13,7 +14,8 @@ interface Retiro {
   precio: number;
   fecha_inicio?: string;
   fecha_fin?: string;
-  whatsapp_contacto?: string;
+  imagen_url?: string;
+  tipo_acceso: 'pago' | 'whatsapp';
   activo: boolean;
 }
 
@@ -56,10 +58,6 @@ export default function RetiroDetallePage() {
     ? `${new Date(retiro.fecha_inicio).toLocaleDateString('es-MX', { day: 'numeric', month: 'long' })} – ${new Date(retiro.fecha_fin).toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' })}`
     : null;
 
-  const waLink = retiro.whatsapp_contacto
-    ? `https://wa.me/${retiro.whatsapp_contacto.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola, me interesa el retiro "${retiro.nombre}". ¿Puedes darme más información?`)}`
-    : null;
-
   return (
     <div className="min-h-screen px-4 py-16">
       <div className="max-w-3xl mx-auto">
@@ -72,6 +70,13 @@ export default function RetiroDetallePage() {
         </button>
 
         <div className="w-8 h-px bg-sand mb-6" />
+
+        {retiro.imagen_url && (
+          <div className="relative w-full h-64 mb-8 rounded-wellness overflow-hidden">
+            <Image src={retiro.imagen_url} alt={retiro.nombre} fill className="object-cover" />
+          </div>
+        )}
+
         {fechas && <p className="label-wellness mb-3">{fechas}</p>}
         <h1 className="text-4xl text-tierra mb-2">{retiro.nombre}</h1>
         {retiro.lugar && <p className="text-tierra-light text-sm mb-6">{retiro.lugar}</p>}
@@ -96,28 +101,28 @@ export default function RetiroDetallePage() {
             </p>
           </div>
 
-          <div className="space-y-3">
+          {retiro.tipo_acceso === 'pago' ? (
             <button
               onClick={() => router.push(`/retiros/inscripcion?retiro_id=${retiro.id}&precio=${retiro.precio}&nombre=${encodeURIComponent(retiro.nombre)}`)}
               className="btn-primary w-full text-center"
             >
               Inscribirme
             </button>
-
-            {waLink && (
-              <a
-                href={waLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-secondary w-full text-center block"
-              >
-                Contactar por WhatsApp
-              </a>
-            )}
-          </div>
+          ) : (
+            <a
+              href={`https://wa.me/52${process.env.NEXT_PUBLIC_WHATSAPP_MARIFER ?? ''}?text=${encodeURIComponent(`Hola, me interesa el retiro "${retiro.nombre}". ¿Puedes darme más información?`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary w-full text-center block"
+            >
+              Contactar por WhatsApp
+            </a>
+          )}
 
           <p className="text-tierra-light text-xs text-center mt-4">
-            Recibirás confirmación por WhatsApp una vez validado tu lugar.
+            {retiro.tipo_acceso === 'pago'
+              ? 'Recibirás confirmación por WhatsApp una vez validado tu lugar.'
+              : 'Te responderemos a la brevedad por WhatsApp.'}
           </p>
         </div>
 
