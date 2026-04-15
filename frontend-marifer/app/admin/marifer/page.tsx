@@ -11,6 +11,7 @@ interface Retiro {
   fecha_inicio?: string;
   fecha_fin?: string;
   precio: number;
+  tipo_acceso: 'pago' | 'whatsapp';
 }
 
 interface Evento {
@@ -67,6 +68,15 @@ export default function AdminMariferPage() {
       setError(err instanceof Error ? err.message : 'Error');
     } finally {
       setLoadingInscritos(false);
+    }
+  }
+
+  async function handleTipoAcceso(retiroId: string, tipo: 'pago' | 'whatsapp') {
+    try {
+      await api.patch(`/api/retiros/${retiroId}`, { tipo_acceso: tipo });
+      setRetiros(prev => prev.map(r => r.id === retiroId ? { ...r, tipo_acceso: tipo } : r));
+    } catch {
+      setError('Error al actualizar tipo de acceso');
     }
   }
 
@@ -130,13 +140,28 @@ export default function AdminMariferPage() {
                 {retiros.map(r => (
                   <div
                     key={r.id}
-                    className={`bg-white border rounded-wellness px-4 py-3 cursor-pointer transition-colors ${
+                    className={`bg-white border rounded-wellness px-4 py-3 transition-colors ${
                       vistaActual?.id === r.id ? 'border-sage bg-sage-muted/30' : 'border-beige-lino hover:border-sage'
                     }`}
-                    onClick={() => verInscritos('retiro', r.id, r.nombre)}
                   >
-                    <p className="text-sm text-tierra">{r.nombre}</p>
-                    <p className="text-xs text-tierra-light">{r.lugar ?? '—'} · ${r.precio.toLocaleString('es-MX')} MXN</p>
+                    <div
+                      className="cursor-pointer"
+                      onClick={() => verInscritos('retiro', r.id, r.nombre)}
+                    >
+                      <p className="text-sm text-tierra">{r.nombre}</p>
+                      <p className="text-xs text-tierra-light">{r.lugar ?? '—'} · ${r.precio.toLocaleString('es-MX')} MXN</p>
+                    </div>
+                    <div className="mt-2 flex items-center gap-2">
+                      <select
+                        value={r.tipo_acceso}
+                        onChange={e => handleTipoAcceso(r.id, e.target.value as 'pago' | 'whatsapp')}
+                        className="text-xs border border-beige-lino rounded px-2 py-1 text-tierra-light bg-white"
+                        onClick={e => e.stopPropagation()}
+                      >
+                        <option value="pago">Pago</option>
+                        <option value="whatsapp">WhatsApp</option>
+                      </select>
+                    </div>
                   </div>
                 ))}
               </div>
